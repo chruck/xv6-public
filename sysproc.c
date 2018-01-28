@@ -43,7 +43,7 @@ sys_getpid(void)
 }
 
 int
-sys_getprocsinfo(void)
+sys_getprocsinfo(struct procinfo *allprocs)
 {
   return myproc()->pid;
 }
