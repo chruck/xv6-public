@@ -1747,7 +1747,7 @@ rand()
 
 // does getprocsinfo() pass NULL?
 void
-test(void)
+nulltest(void)
 {
         printf(stdout, "test test\n");
         if (0) {
@@ -1758,10 +1758,42 @@ test(void)
 }
 
 // does getprocsinfo() pass PIDs and process names?
+void
+procinfotest(void)
+{
+        printf(stdout, "test test\n");
+        if (0) {
+                printf(stdout, "test failed\n");
+                exit();
+        }
+        printf(stdout, "test ok\n");
+}
+
 
 // does getprocsinfo() return number of existing processes?
+void
+numproctest(void)
+{
+        printf(stdout, "test test\n");
+        if (0) {
+                printf(stdout, "test failed\n");
+                exit();
+        }
+        printf(stdout, "test ok\n");
+}
+
 
 // does getprocsinfo() return -1 on error?
+void
+errortest(void)
+{
+        printf(stdout, "test test\n");
+        if (0) {
+                printf(stdout, "test failed\n");
+                exit();
+        }
+        printf(stdout, "test ok\n");
+}
 
 int
 main(int argc, char *argv[])
@@ -1774,7 +1806,10 @@ main(int argc, char *argv[])
         }
         close(open("test.ran", O_CREATE));
 
-        test();
+        nulltest();
+        procinfotest();
+        numproctest();
+        errortest();
 
         exit();
 }
