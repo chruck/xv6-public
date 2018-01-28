@@ -1745,54 +1745,59 @@ rand()
   return randstate;
 }
 
+// does getprocsinfo() return number of existing processes?
+void
+numproctest(void)
+{
+        int numpids = getprocsinfo();
+
+        printf(stdout, "numproctest test\n");
+
+        if (0 == numpids) {
+                printf(stdout, "numproctest failed: expecting more than "
+                               "0 pids\n");
+                exit();
+        }
+        printf(stdout, "    number of processes: %d\n", numpids);
+        printf(stdout, "numproctest ok\n");
+}
+
 // does getprocsinfo() pass NULL?
 void
 nulltest(void)
 {
-        printf(stdout, "test test\n");
+        printf(stdout, "null test\n");
         if (0) {
-                printf(stdout, "test failed\n");
+                printf(stdout, "null failed\n");
                 exit();
         }
-        printf(stdout, "test ok\n");
+        printf(stdout, "null ok\n");
 }
 
 // does getprocsinfo() pass PIDs and process names?
 void
 procinfotest(void)
 {
-        printf(stdout, "test test\n");
+        printf(stdout, "procinfotest test\n");
         if (0) {
-                printf(stdout, "test failed\n");
+                printf(stdout, "procinfotest failed\n");
                 exit();
         }
-        printf(stdout, "test ok\n");
+        printf(stdout, "procinfotest ok\n");
 }
 
-
-// does getprocsinfo() return number of existing processes?
-void
-numproctest(void)
-{
-        printf(stdout, "test test\n");
-        if (0) {
-                printf(stdout, "test failed\n");
-                exit();
-        }
-        printf(stdout, "test ok\n");
-}
 
 
 // does getprocsinfo() return -1 on error?
 void
 errortest(void)
 {
-        printf(stdout, "test test\n");
+        printf(stdout, "errortest test\n");
         if (0) {
-                printf(stdout, "test failed\n");
+                printf(stdout, "errortest failed\n");
                 exit();
         }
-        printf(stdout, "test ok\n");
+        printf(stdout, "errortest ok\n");
 }
 
 int
