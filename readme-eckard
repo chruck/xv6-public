@@ -1,5 +1,6 @@
 Changes made to original xv6 source code in order to add syscall
 getprocsinfo():
+---
 
 NOTE:  Project1.pdf refers to getprocsinfo() and getprocinfo(), but
 for consistancy I'm only using getprocsinfo().  It also refers to
@@ -8,25 +9,30 @@ function testgetprocsinfo to follow the name of the function it was
 testing.
 
 Makefile:
-- Appended _testgetprocsinfo to UPROGS
-- Added testgetprocsinfo.c to EXTRA
+- Appended `_testgetprocsinfo` to `UPROGS`
+- Added `testgetprocsinfo.c` to `EXTRA`
 
 syscall.h:
-- Made SYS_getprocsinfo 22
+- Set `SYS_getprocsinfo` to `22`
 
 syscall.c:
-- Appended sys_getprocsinfo to syscalls
-- Referenced external function sys_getprocsinfo()
+- Appended `sys_getprocsinfo` to `syscalls`
+- Referenced external function `sys_getprocsinfo()`
 
 sysproc.c:
-- Added getprocsinfo syscall as sys_getprocsinfo()
+- Added `getprocsinfo` syscall as `sys_getprocsinfo()`
 
 usys.S:
-- Appended getprocsinfo to SYSCALL macro calls
+- Appended `getprocsinfo` to `SYSCALL` macro calls
 
 user.h:
-- Appended getprocsinfo prototype
+- Appended `getprocsinfo` prototype
 
 testgetprocsinfo.c:
-- Created to test getprocsinfo syscall
+- Created to have several tests against `getprocsinfo()` syscall
 
+proc.h:
+- Appended definition of `struct procinfo`
+
+mmu.h:
+- Surrounded file with include guard `MMU_H`
