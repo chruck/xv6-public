@@ -1,0 +1,9 @@
+target remote :26000  (tar rem :260000)
+file kernel
+br swtch
+bt <-- backtrace
+up
+step (s)
+next (n)
+qemu prompt:  ctl-A c
+        quit (q)

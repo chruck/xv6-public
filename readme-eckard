@@ -1,0 +1,26 @@
+Changes made to original xv6 source code in order to add syscall
+getprocsinfo():
+
+NOTE:  Project1.pdf refers to getprocsinfo() and getprocinfo(), but
+for consistancy I'm only using getprocsinfo().  It also refers to
+testgetprocinfo and testprocinfo, but I called my program, file, and
+function testgetprocsinfo to follow the name of the function it was
+testing.
+
+Makefile:
+- Appended _testgetprocsinfo to UPROGS
+- Added testgetprocsinfo.c to EXTRA
+
+syscall.h:
+- Made SYS_getprocsinfo 22
+
+syscall.c:
+- Appended sys_getprocsinfo to syscalls
+- Referenced external function sys_getprocsinfo()
+
+sysproc.c:
+- Added getprocsinfo syscall as sys_getprocsinfo()
+
+testgetprocsinfo.c:
+- Created to test getprocsinfo syscall
+
