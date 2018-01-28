@@ -1766,58 +1766,15 @@ test(void)
 int
 main(int argc, char *argv[])
 {
-  printf(1, "testgetprocsinfo starting\n");
+        printf(1, "testgetprocsinfo starting\n");
 
-  if(open("usertests.ran", 0) >= 0){
-    printf(1, "already ran user tests -- rebuild fs.img\n");
-    exit();
-  }
-  close(open("usertests.ran", O_CREATE));
+        if (open("test.ran", 0) >= 0){
+                printf(1, "already ran user tests -- rebuild fs.img\n");
+                exit();
+        }
+        close(open("test.ran", O_CREATE));
 
-  argptest();
-  createdelete();
-  linkunlink();
-  concreate();
-  fourfiles();
-  sharedfd();
+        test();
 
-  bigargtest();
-  bigwrite();
-  bigargtest();
-  bsstest();
-  sbrktest();
-  validatetest();
-
-  opentest();
-  writetest();
-  writetest1();
-  createtest();
-
-  openiputtest();
-  exitiputtest();
-  iputtest();
-
-  mem();
-  pipe1();
-  preempt();
-  exitwait();
-
-  rmdot();
-  fourteen();
-  bigfile();
-  subdir();
-  linktest();
-  unlinkread();
-  dirfile();
-  iref();
-  forktest();
-  bigdir(); // slow
-
-  uio();
-
-  exectest();
-
-  test();
-
-  exit();
+        exit();
 }
