@@ -21,6 +21,12 @@ syscall.c:
 sysproc.c:
 - Added getprocsinfo syscall as sys_getprocsinfo()
 
+usys.S:
+- Appended getprocsinfo to SYSCALL macro calls
+
+user.h:
+- Appended getprocsinfo prototype
+
 testgetprocsinfo.c:
 - Created to test getprocsinfo syscall
 
