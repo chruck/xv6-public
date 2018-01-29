@@ -45,9 +45,10 @@ sys_getpid(void)
 int
 sys_getprocsinfo(void)
 {
-        struct procinfo *allprocs = 0;
+        struct procinfo **allprocs;
 
-        if (argint(0, (int *)allprocs) < 0) {
+        //if (argint(0, (int *)allprocs) < 0) {
+        if (argptr(0, (char **)&allprocs, sizeof(struct procinfo)) < 0) {
                 return -1;
         }
 
