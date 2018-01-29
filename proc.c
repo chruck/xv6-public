@@ -532,3 +532,48 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+int getprocsinfo(struct procinfo *allprocs)
+{
+        static char *states[] = {
+                [UNUSED]    "unused",
+                [EMBRYO]    "embryo",
+                [SLEEPING]  "sleep ",
+                [RUNNABLE]  "runble",
+                [RUNNING]   "run   ",
+                [ZOMBIE]    "zombie"
+        };
+        char *state = 0;
+
+        acquire(&ptable.lock);
+
+        for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; ++p) {
+                if (UNUSED == p->state) {
+                        continue;
+                }
+
+                if (0 <= p->state && NELEM(states) > p->state &&
+                                states[p->state]) {
+                        state= states[p->state];
+                } else {
+                        state = "???";
+                }
+
+                cprintf("%d %s %s", p->pid, state, p->name);
+
+                /*
+                if (SLEEPING == p->state) {
+                        getcallerpcs((uint *)p->context->ebp +2, pc);
+
+                        for (int i = 0; 10 > i && 0 != pc[i]; ++i) {
+                                cprintf(" %p", pc[i]);
+                        }
+                }
+                */
+                cprintf("\n");
+        }
+
+        release(&ptable.lock);
+
+        return 0;
+}
