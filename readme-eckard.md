@@ -19,7 +19,8 @@ syscall.c:
 - Referenced external function `sys_getprocsinfo()`
 
 sysproc.c:
-- Added `getprocsinfo` syscall as `sys_getprocsinfo()`
+- Added `getprocsinfo` syscall as `sys_getprocsinfo()`, which calls
+`getprocsinfo()`
 
 usys.S:
 - Appended `getprocsinfo` to `SYSCALL` macro calls
@@ -38,6 +39,7 @@ mmu.h:
 
 proc.c:
 - Created function `getprocsinfo()` that is used by the system call.
+This is where the majority of the stuff happens.
 
 defs.h:
 - Prototyped `getprocsinfo()` and `struct procinfo` from `proc.c`
