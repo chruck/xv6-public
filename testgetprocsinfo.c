@@ -25,8 +25,8 @@ spinner(int i)
 void
 forkincreasestest(void)
 {
-        struct procinfo allprocs[10];
-        int numpidsbefore = getprocsinfo(allprocs);
+        struct procinfo allprocs[NPROC];
+        int numpidsbefore = getprocsinfo((struct procinfo**)&allprocs);
         int numpidsafter = 0;
         int pid = 0;
 
@@ -41,7 +41,7 @@ forkincreasestest(void)
         if (0 == pid) {
                 // child
                 printf(stdout, "\n.");
-                for (int i = 0; i < 1000; ++i) {
+                for (int i = 0; i < 100; ++i) {
                         spinner(i);
                         sleep(1);
                 }
@@ -49,7 +49,7 @@ forkincreasestest(void)
                 exit();
         }
 
-        numpidsafter = getprocsinfo(allprocs);
+        numpidsafter = getprocsinfo((struct procinfo **)&allprocs);
         printf(stdout, "    number of processes after: %d\n", numpidsafter);
         wait();
 
@@ -65,8 +65,8 @@ forkincreasestest(void)
 void
 numproctest(void)
 {
-        struct procinfo allprocs[10];
-        int numpids = getprocsinfo(allprocs);
+        struct procinfo allprocs[NPROC];
+        int numpids = getprocsinfo((struct procinfo **)&allprocs);
 
         printf(stdout, "numproctest test\n");
 
@@ -84,13 +84,13 @@ void
 nulltest(void)
 {
         struct procinfo nullprocinfo = {0};
-        struct procinfo allprocs[10] = {0};
-        int numpids = getprocsinfo(allprocs);
+        struct procinfo allprocs[NPROC] = {0};
+        int numpids = getprocsinfo((struct procinfo **)&allprocs);
 
         printf(stdout, "null test\n", numpids);
 
-        if (nullprocinfo.pid == allprocs->pid
-            && strcmp(nullprocinfo.name, allprocs->name)) {
+        if (nullprocinfo.pid == allprocs[0].pid
+            && strcmp(nullprocinfo.pname, allprocs[0].pname)) {
                 printf(stdout, "null failed\n");
                 exit();
         }
@@ -102,13 +102,25 @@ nulltest(void)
 void
 procinfotest(void)
 {
-        struct procinfo allprocs[10];
-        int numpids = getprocsinfo(allprocs);
+        struct procinfo allprocs[NPROC];
+        int numpids = getprocsinfo((struct procinfo **)&allprocs);
 
-        printf(stdout, "procinfotest test\n", numpids);
-        if (0) {
-                printf(stdout, "procinfotest failed\n");
-                exit();
+        printf(stdout, "procinfotest test\n");
+        for (--numpids; 0 <= numpids; --numpids) {
+                printf(stdout, "        %d:  %d  %s\n", numpids, allprocs[numpids].pid,
+                                allprocs[numpids].pname);
+                if (0 >= allprocs[numpids].pid) {
+                        printf(stdout, "procinfotest failed:  pid %d "
+                                       "below or equal to zero\n",
+                                        allprocs[numpids].pid);
+                        //exit();
+                }
+                if (0 == allprocs[numpids].pname[0] ) {
+                        printf(stdout, "procinfotest failed:  pid %d "
+                                        "w/o name\n",
+                                        allprocs[numpids].pid);
+                        exit();
+                }
         }
         printf(stdout, "procinfotest ok\n");
 }
@@ -117,11 +129,11 @@ procinfotest(void)
 void
 errortest(void)
 {
-        struct procinfo allprocs[10];
-        int numpids = getprocsinfo(allprocs);
+        struct procinfo allprocs[NPROC];
+        int numpids = getprocsinfo((struct procinfo **)&allprocs);
 
-        printf(stdout, "errortest test\n", numpids);
-        if (0) {
+        printf(stdout, "errortest test\n");
+        if (-1 == numpids) {
                 printf(stdout, "errortest failed\n");
                 exit();
         }
@@ -139,11 +151,11 @@ main(int argc, char *argv[])
         }
         close(open("test.ran", O_CREATE));
 
-        nulltest();
-        procinfotest();
-        numproctest();
         errortest();
+        nulltest();
+        numproctest();
         forkincreasestest();
+        procinfotest();
 
         exit();
 }
