@@ -61,6 +61,6 @@ struct proc {
 
 // Info about processes
 struct procinfo {
-        int pid;                     // Process ID
-        char name[16];               // Process name (debugging)
+        int pid;         // Process ID
+        char pname[16];  // Process name (debugging)
 };
