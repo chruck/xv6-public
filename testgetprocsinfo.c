@@ -41,8 +41,9 @@ forkincreasestest(void)
         if (0 == pid) {
                 // child
                 printf(stdout, "\n.");
-                for (int i = 0; i < 10000; ++i) {
+                for (int i = 0; i < 1000; ++i) {
                         spinner(i);
+                        sleep(1);
                 }
                 printf(stdout, "\n");
                 exit();
