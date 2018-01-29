@@ -533,8 +533,9 @@ procdump(void)
   }
 }
 
-int getprocsinfo(struct procinfo *allprocs)
+int getprocsinfo(struct procinfo **allprocs)
 {
+        /*
         static char *states[] = {
                 [UNUSED]    "unused",
                 [EMBRYO]    "embryo",
@@ -544,6 +545,8 @@ int getprocsinfo(struct procinfo *allprocs)
                 [ZOMBIE]    "zombie"
         };
         char *state = 0;
+        */
+        int numprocs = 0;
 
         acquire(&ptable.lock);
 
@@ -552,16 +555,16 @@ int getprocsinfo(struct procinfo *allprocs)
                         continue;
                 }
 
+                /*
                 if (0 <= p->state && NELEM(states) > p->state &&
                                 states[p->state]) {
-                        state= states[p->state];
+                        state = states[p->state];
                 } else {
                         state = "???";
                 }
 
                 cprintf("%d %s %s", p->pid, state, p->name);
 
-                /*
                 if (SLEEPING == p->state) {
                         getcallerpcs((uint *)p->context->ebp +2, pc);
 
@@ -569,11 +572,15 @@ int getprocsinfo(struct procinfo *allprocs)
                                 cprintf(" %p", pc[i]);
                         }
                 }
-                */
                 cprintf("\n");
+                */
+                allprocs[numprocs]->pid = p->pid;
+                strncpy(allprocs[numprocs]->pname, p->name, 16);
+
+                ++numprocs;
         }
 
         release(&ptable.lock);
 
-        return 0;
+        return numprocs;
 }
