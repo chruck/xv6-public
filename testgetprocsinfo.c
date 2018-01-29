@@ -102,7 +102,8 @@ nulltest(void)
 void
 procinfotest(void)
 {
-        struct procinfo allprocs[NPROC];
+        struct procinfo bogus = {105, "procinfotest"};
+        struct procinfo allprocs[NPROC] = {bogus};
         int numpids = getprocsinfo((struct procinfo **)&allprocs);
 
         printf(stdout, "procinfotest test\n");

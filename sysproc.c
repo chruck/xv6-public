@@ -45,7 +45,8 @@ sys_getpid(void)
 int
 sys_getprocsinfo(void)
 {
-        struct procinfo **allprocs;
+        struct procinfo bogus = {.pid = 48, .pname = "sys"};
+        struct procinfo *allprocs[NPROC] = {&bogus};
 
         //if (argint(0, (int *)allprocs) < 0) {
         if (argptr(0, (char **)&allprocs, sizeof(struct procinfo)) < 0) {

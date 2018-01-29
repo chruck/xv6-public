@@ -1,3 +1,5 @@
+#define NPROC        64  // maximum number of processes
+
 struct buf;
 struct context;
 struct file;
@@ -121,7 +123,7 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
-int             getprocsinfo(struct procinfo **allprocs);
+int             getprocsinfo(struct procinfo *allprocs[NPROC]);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

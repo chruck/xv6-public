@@ -533,7 +533,7 @@ procdump(void)
   }
 }
 
-int getprocsinfo(struct procinfo **allprocs)
+int getprocsinfo(struct procinfo *allprocs[NPROC])
 {
         /*
         static char *states[] = {
