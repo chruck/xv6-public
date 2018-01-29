@@ -121,7 +121,7 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
-int             getprocsinfo(struct procinfo *allprocs);
+int             getprocsinfo(struct procinfo **allprocs);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
