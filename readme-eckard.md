@@ -1,12 +1,11 @@
-Changes made to original xv6 source code in order to add syscall
-getprocsinfo():
+Changes made to original xv6 source code in order to add syscall getprocsinfo():
 ---
 
-NOTE:  Project1.pdf refers to getprocsinfo() and getprocinfo(), but
-for consistancy I'm only using getprocsinfo().  It also refers to
-testgetprocinfo and testprocinfo, but I called my program, file, and
-function testgetprocsinfo to follow the name of the function it was
-testing.
+NOTE:  `Project1.pdf` refers to `getprocsinfo()` and `getprocinfo()`,
+but for consistancy I'm only using `getprocsinfo()`.  It also refers to
+`testgetprocinfo` and `testprocinfo`, but I called my program, file,
+and function `testgetprocsinfo` to follow the name of the function it
+was testing.
 
 Makefile:
 - Appended `_testgetprocsinfo` to `UPROGS`
@@ -36,3 +35,9 @@ proc.h:
 
 mmu.h:
 - Surrounded file with include guard `MMU_H`
+
+proc.c:
+- Created function `getprocsinfo()` that is used by the system call.
+
+defs.h:
+- Prototyped `getprocsinfo()` and `struct procinfo` from `proc.c`
