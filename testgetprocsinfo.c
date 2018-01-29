@@ -83,14 +83,18 @@ numproctest(void)
 void
 nulltest(void)
 {
-        struct procinfo allprocs[10];
+        struct procinfo nullprocinfo = {0};
+        struct procinfo allprocs[10] = {0};
         int numpids = getprocsinfo(allprocs);
 
         printf(stdout, "null test\n", numpids);
-        if (0) {
+
+        if (nullprocinfo.pid == allprocs->pid
+            && strcmp(nullprocinfo.name, allprocs->name)) {
                 printf(stdout, "null failed\n");
                 exit();
         }
+
         printf(stdout, "null ok\n");
 }
 
@@ -130,7 +134,7 @@ main(int argc, char *argv[])
         printf(1, "testgetprocsinfo starting\n");
 
         if (open("test.ran", 0) >= 0){
-                printf(1, "already ran user tests -- rebuild fs.img\n");
+                printf(1, "already ran user tests -- rm test.ran\n");
                 exit();
         }
         close(open("test.ran", O_CREATE));
