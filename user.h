@@ -1,5 +1,3 @@
-#define NPROC        64  // maximum number of processes
-
 struct stat;
 struct rtcdate;
 struct procinfo;
@@ -26,7 +24,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int getprocsinfo(struct procinfo *allprocs[NPROC]);
+int getprocsinfo(struct procinfo **allprocs);
 
 // ulib.c
 int stat(char*, struct stat*);
