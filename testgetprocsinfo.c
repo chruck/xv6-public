@@ -102,24 +102,23 @@ nulltest(void)
 void
 procinfotest(void)
 {
-        struct procinfo bogus = {105, "procinfotest"};
-        struct procinfo allprocs[NPROC] = {bogus};
+        struct procinfo allprocs[NPROC] = {0};
         int numpids = getprocsinfo((struct procinfo **)&allprocs);
 
         printf(stdout, "procinfotest test\n");
-        for (--numpids; 0 <= numpids; --numpids) {
-                printf(stdout, "        %d:  %d  %s\n", numpids, allprocs[numpids].pid,
-                                allprocs[numpids].pname);
-                if (0 >= allprocs[numpids].pid) {
+        for (int i = 0; i < numpids; ++i) {
+                printf(stdout, "        %d  '%s'\n",
+                                allprocs[i].pid, allprocs[i].pname);
+                if (0 >= allprocs[i].pid) {
                         printf(stdout, "procinfotest failed:  pid %d "
                                        "below or equal to zero\n",
-                                        allprocs[numpids].pid);
-                        //exit();
+                                        allprocs[i].pid);
+                        exit();
                 }
-                if (0 == allprocs[numpids].pname[0] ) {
+                if (0 == allprocs[i].pname[0] ) {
                         printf(stdout, "procinfotest failed:  pid %d "
                                         "w/o name\n",
-                                        allprocs[numpids].pid);
+                                        allprocs[i].pid);
                         exit();
                 }
         }
