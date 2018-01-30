@@ -1,16 +1,11 @@
 #include "param.h"
 #include "types.h"
-#include "stat.h"
 #include "user.h"
-#include "fs.h"
 #include "fcntl.h"
-#include "syscall.h"
-#include "traps.h"
-#include "memlayout.h"
+#include "mmu.h"
 #include "proc.h"
 
 #define stdout 1
-#define NULL 0
 
 // draw a spinner
 void
