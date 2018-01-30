@@ -533,20 +533,10 @@ procdump(void)
   }
 }
 
-int getprocsinfo(struct procinfo *allprocs[NPROC])
+int getprocsinfo(struct procinfo **allprocs)
 {
-        /*
-        static char *states[] = {
-                [UNUSED]    "unused",
-                [EMBRYO]    "embryo",
-                [SLEEPING]  "sleep ",
-                [RUNNABLE]  "runble",
-                [RUNNING]   "run   ",
-                [ZOMBIE]    "zombie"
-        };
-        char *state = 0;
-        */
         int numprocs = 0;
+        struct procinfo *pi = *allprocs;
 
         acquire(&ptable.lock);
 
@@ -555,28 +545,10 @@ int getprocsinfo(struct procinfo *allprocs[NPROC])
                         continue;
                 }
 
-                /*
-                if (0 <= p->state && NELEM(states) > p->state &&
-                                states[p->state]) {
-                        state = states[p->state];
-                } else {
-                        state = "???";
-                }
+                pi->pid = p->pid;
+                strncpy(pi->pname, p->name, 16);
 
-                cprintf("%d %s %s", p->pid, state, p->name);
-
-                if (SLEEPING == p->state) {
-                        getcallerpcs((uint *)p->context->ebp +2, pc);
-
-                        for (int i = 0; 10 > i && 0 != pc[i]; ++i) {
-                                cprintf(" %p", pc[i]);
-                        }
-                }
-                cprintf("\n");
-                */
-                allprocs[numprocs]->pid = p->pid;
-                strncpy(allprocs[numprocs]->pname, p->name, 16);
-
+                ++pi;
                 ++numprocs;
         }
 
