@@ -1,26 +1,11 @@
-Changes made to original xv6 source code in order to add syscall
-`getprocsinfo()`:
+Changes made to original xv6 source code for Project 2
 ===
 
 NOTES:
-- `Project1.pdf` refers to `getprocsinfo()` and `getprocinfo()`, but
-for consistancy I'm only using `getprocsinfo()`.
-- It also refers to `testgetprocinfo` and `testprocinfo`, but I called
-my program, file, and function `testgetprocsinfo` to follow the name of
-the function it was testing.
-- Furthermore, I changed the prototype to:
-```
-        int getprocsinfo(struct procinfo **)
-```
-because the `procinfo` struct only has "two data members, an integer
-__pid__ and a string __pname__" but the requirement for the syscall is
-that it "returns the PID value and process name for each of the
-processes that exists in the system at the time of the call", thus
-requiring an "array".
 
 Makefile:
-- Appended `_testgetprocsinfo` to `UPROGS`.
-- Added `testgetprocsinfo.c` to `EXTRA`.
+- Appended `_derefnull` and `_proj2test` to `UPROGS`.
+- Added `derefnull.c` and `proj2test.c` to `EXTRA`.
 
 defs.h:
 - Prototyped `struct procinfo` and `getprocsinfo()` from `proc.c`.
