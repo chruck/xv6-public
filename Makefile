@@ -160,6 +160,7 @@ mkfs: mkfs.c fs.h
 
 UPROGS=\
 	_cat\
+	_derefnull\
 	_echo\
 	_forktest\
 	_grep\
@@ -168,6 +169,7 @@ UPROGS=\
 	_ln\
 	_ls\
 	_mkdir\
+	_proj2tests\
 	_rm\
 	_sh\
 	_stressfs\
@@ -243,7 +245,7 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
 EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
-	printf.c umalloc.c\
+	printf.c umalloc.c derefnull.c proj2tests.c \
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 
