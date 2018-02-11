@@ -625,36 +625,36 @@ skipelem(char *path, char *name)
 static struct inode*
 namex(char *path, int nameiparent, char *name)
 {
-  struct inode *ip, *next;
+        struct inode *inode_p, *next;
 
-  if(*path == '/')
-    ip = iget(ROOTDEV, ROOTINO);
-  else
-    ip = idup(myproc()->cwd);
+        if (*path == '/')
+                inode_p = iget(ROOTDEV, ROOTINO);
+        else
+                inode_p = idup(myproc()->cwd);
 
-  while((path = skipelem(path, name)) != 0){
-    ilock(ip);
-    if(ip->type != T_DIR){
-      iunlockput(ip);
-      return 0;
-    }
-    if(nameiparent && *path == '\0'){
-      // Stop one level early.
-      iunlock(ip);
-      return ip;
-    }
-    if((next = dirlookup(ip, name, 0)) == 0){
-      iunlockput(ip);
-      return 0;
-    }
-    iunlockput(ip);
-    ip = next;
-  }
-  if(nameiparent){
-    iput(ip);
-    return 0;
-  }
-  return ip;
+        while ((path = skipelem(path, name)) != 0) {
+                ilock(inode_p);
+                if (inode_p->type != T_DIR) {
+                        iunlockput(inode_p);
+                        return 0;
+                }
+                if (nameiparent && *path == '\0') {
+                        // Stop one level early.
+                        iunlock(inode_p);
+                        return inode_p;
+                }
+                if ((next = dirlookup(inode_p, name, 0)) == 0) {
+                        iunlockput(inode_p);
+                        return 0;
+                }
+                iunlockput(inode_p);
+                inode_p = next;
+        }
+        if (nameiparent) {
+                iput(inode_p);
+                return 0;
+        }
+        return inode_p;
 }
 
 struct inode*
