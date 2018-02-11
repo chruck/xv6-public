@@ -162,7 +162,6 @@ mkfs: mkfs.c fs.h
 
 UPROGS=\
 	_cat\
-	_derefnull\
 	_echo\
 	_forktest\
 	_grep\
@@ -178,6 +177,7 @@ UPROGS=\
 	_usertests\
 	_wc\
 	_zombie\
+	_testderefnull\
 	_testshmem\
 
 fs.img: mkfs README $(UPROGS)
