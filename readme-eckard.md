@@ -3,9 +3,35 @@ Changes made to original xv6 source code for Project 2
 
 NOTES:
 
+readme-eckard.md:
+- This file, explaining all files that were changed or created.
+
 Makefile:
 - Appended `_derefnull` and `_proj2test` to `UPROGS`.
 - Added `derefnull.c` and `proj2test.c` to `EXTRA`.
+
+derefnull.c:
+- Created to test dereferencing a NULL pointer.
+
+syscall.c:
+- Referenced external functions `sys_shmem_access()` and
+`sys_shmem_count`.
+- Appended `sys_shmem_access` and `sys_shmem_count` to `syscalls`.
+
+syscall.h:
+- Set `SYS_shmem_access` to `22` and `SYS_shmem_count` to `23`.
+
+usys.S:
+- Appended `shmem_access; and `shmem_count` to `SYSCALL` macro calls.
+
+vm.c:
+- Implementation of `sys_shmem_count` and `sys_shmem_access`
+functions.
+
+testshmem.c:
+- Program created to have several tests against `shmem_*()` syscalls.
+
+---
 
 defs.h:
 - Prototyped `struct procinfo` and `getprocsinfo()` from `proc.c`.
@@ -17,26 +43,10 @@ This is where the majority of the stuff happens.
 proc.h:
 - Appended definition of `struct procinfo`.
 
-readme-eckard.md:
-- This file, explaining all files that were changed or created.
-
-syscall.h:
-- Set `SYS_getprocsinfo` to `22`.
-
-syscall.c:
-- Referenced external function `sys_getprocsinfo()`.
-- Appended `sys_getprocsinfo` to `syscalls`.
-
 sysproc.c:
 - Added `getprocsinfo` syscall as `sys_getprocsinfo()`, which calls
 `getprocsinfo()`.
 
-testgetprocsinfo.c:
-- Created to have several tests against `getprocsinfo()` syscall.
-
 user.h:
 - Added `struct procinfo` declaration.
 - Appended `getprocsinfo` prototype.
-
-usys.S:
-- Appended `getprocsinfo` to `SYSCALL` macro calls.
