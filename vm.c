@@ -383,6 +383,38 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
+void *
+shmem_access(int page_number)
+{
+        void *page_addr = (void *)0;
+
+        return page_addr;
+}
+
+int
+shmem_count(int page_number)
+{
+        return shmem_count(page_number);
+}
+
+int
+sys_shmem_access(void)
+{
+        int page_number = 0;
+
+        shmem_access(page_number);
+
+        return 0;
+}
+
+int
+sys_shmem_count(void)
+{
+        int page_number = 0;
+
+        return shmem_count(page_number);
+}
+
 //PAGEBREAK!
 // Blank page.
 //PAGEBREAK!
