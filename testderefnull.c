@@ -8,7 +8,7 @@
 *
 * @section DESCRIPTION
 *
-* This file tests null pointer dereferencing
+* This file tests null pointer dereferencing for Project 2 Part A
 
 * Output in Linux:
 
