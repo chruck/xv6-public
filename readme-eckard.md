@@ -3,15 +3,15 @@ Changes made to original xv6 source code for Project 2
 
 NOTES:
 
-readme-eckard.md:
-- This file, explaining all files that were changed or created.
-
 Makefile:
 - Appended `_derefnull` and `_proj2test` to `UPROGS`.
 - Added `derefnull.c` and `proj2test.c` to `EXTRA`.
 
 derefnull.c:
 - Created to test dereferencing a NULL pointer.
+
+readme-eckard.md:
+- This file, explaining all files that were changed or created.
 
 syscall.c:
 - Referenced external functions `sys_shmem_access()` and
@@ -21,15 +21,15 @@ syscall.c:
 syscall.h:
 - Set `SYS_shmem_access` to `22` and `SYS_shmem_count` to `23`.
 
+testshmem.c:
+- Program created to have several tests against `shmem_*()` syscalls.
+
 usys.S:
 - Appended `shmem_access; and `shmem_count` to `SYSCALL` macro calls.
 
 vm.c:
-- Implementation of `sys_shmem_count` and `sys_shmem_access`
+- Implementation of `sys_shmem_count()` and `sys_shmem_access()`
 functions.
-
-testshmem.c:
-- Program created to have several tests against `shmem_*()` syscalls.
 
 ---
 
