@@ -22,16 +22,29 @@ Segmentation fault
 */
 
 //#include <stddef.h>
-#include <stdio.h>
+//#include <stdio.h>
+#include "types.h"
+#include "user.h"
 
-int main(int argc, char **argv)
-{
+#define NULL (void *)(0)
+#define stdout 1
+#define out(...) printf(stdout, __VA_ARGS__)
+
         int *nil = NULL;
         char *null = NULL;
         char *something = "something";
+int main(int argc, char **argv)
+{
 
-        printf("NULL is '%s', but something is '%s'.\n", null, something);
-        printf("NULL is '%d'.", *nil);
+        //printf("NULL is '%s', but something is '%s'.\n", null, something);
+        out("NULL is '%s', but something is '%s'.\n", &null, &something);
+        out("NULL is '%s', but something is '%s'.\n", *null, *something);
+        out("NULL is '%s', but something is '%s'.\n", null, something);
+        out("NULL is '%s', but something is '%s'.\n", &null, &something);
+        //printf("NULL is '%d'.", *nil);
+        out("NULL is '%d'.", *nil);
+        out("NULL is '%d'.", nil);
+        out("NULL is '%d'.", &nil);
 
         return 0;
 }
