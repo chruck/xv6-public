@@ -4,8 +4,8 @@ Changes made to original xv6 source code for Project 2
 NOTES:
 
 Makefile:
-- Appended `_derefnull` and `_proj2test` to `UPROGS`.
-- Added `derefnull.c` and `proj2test.c` to `EXTRA`.
+- Appended `_testderefnull` and `_testshmem` to `UPROGS`.
+- Added `testderefnull.c` and `testshmem.c` to `EXTRA`.
 
 readme-eckard.md:
 - This file, explaining all files that were changed or created.
