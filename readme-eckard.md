@@ -7,9 +7,6 @@ Makefile:
 - Appended `_derefnull` and `_proj2test` to `UPROGS`.
 - Added `derefnull.c` and `proj2test.c` to `EXTRA`.
 
-derefnull.c:
-- Created to test dereferencing a NULL pointer.
-
 readme-eckard.md:
 - This file, explaining all files that were changed or created.
 
@@ -20,6 +17,9 @@ syscall.c:
 
 syscall.h:
 - Set `SYS_shmem_access` to `22` and `SYS_shmem_count` to `23`.
+
+testderefnull.c:
+- Created to test dereferencing a NULL pointer.
 
 testshmem.c:
 - Program created to have several tests against `shmem_*()` syscalls.
