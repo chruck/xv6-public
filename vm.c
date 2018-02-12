@@ -383,28 +383,41 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
+int shmem_accessors[4] = { 0, 0, 0, 0 };
+
 void *
 shmem_access(int page_number)
 {
         void *page_addr = (void *)0;
 
+        // TODO:  decrement somewhere?
+        ++shmem_accessors[page_number];
+
         return page_addr;
 }
 
+/*
 int
 shmem_count(int page_number)
 {
-        return shmem_count(page_number);
+        return shmem_accessors[page_number];
 }
+*/
 
 int
 sys_shmem_access(void)
 {
         int page_number = 0;
+        void *page_addr = (void *)0;
+        //int page_addr = 0;
 
-        shmem_access(page_number);
+        if (0 > argint(0, &page_number)) {
+                return -1;
+        }
 
-        return 0;
+        page_addr = shmem_access(page_number);
+
+        return (int) page_addr;
 }
 
 int
@@ -412,7 +425,12 @@ sys_shmem_count(void)
 {
         int page_number = 0;
 
-        return shmem_count(page_number);
+        if (0 > argint(0, &page_number)) {
+                return -1;
+        }
+
+        //return shmem_count(page_number);
+        return shmem_accessors[page_number];
 }
 
 //PAGEBREAK!
