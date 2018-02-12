@@ -33,15 +33,16 @@
 int main(int argc, char *argv[])
 {
         int pid = fork();
+        int pg_num = 1;
         void *pg_addr = NULL;
 
         if (0 == pid) {  // child 1
                 pid = getpid();
-                //pg_addr = shmem_access(0);
-                //strcpy((char *)pg_addr, "foo\0");
+                pg_addr = shmem_access(pg_num);
+                strcpy((char *)pg_addr, "foo\0");
 
-                out("child1[%d]: %d processes accessing shared pg 0 (%s)\n",
-                    pid, shmem_count(0), (char *)pg_addr);
+                out("child1[%d]: %d processes accessing shared pg %d (%s)\n",
+                    pid, shmem_count(pg_num), pg_num, (char *)pg_addr);
 
                 exit();
         }
@@ -53,11 +54,11 @@ int main(int argc, char *argv[])
 
         if (0 == (pid = fork())) {  // child 2
                 pid = getpid();
-                //pg_addr = shmem_access(0);
-                //strcpy((char *)pg_addr, "bar\0");
+                pg_addr = shmem_access(pg_num);
+                strcpy((char *)pg_addr, "bar\0");
 
-                out("child2[%d]: %d processes accessing shared pg 0 (%s)\n",
-                    pid, shmem_count(0), (char *)pg_addr);
+                out("child2[%d]: %d processes accessing shared pg %d (%s)\n",
+                    pid, shmem_count(pg_num), pg_num, (char *)pg_addr);
 
                 exit();
         }
@@ -69,11 +70,11 @@ int main(int argc, char *argv[])
 
         if (0 == (pid = fork())) {  // child 3
                 pid = getpid();
-                //pg_addr = shmem_access(0);
-                //strcpy((char *)pg_addr, "baz\0");
+                pg_addr = shmem_access(pg_num);
+                strcpy((char *)pg_addr, "baz\0");
 
-                out("child3[%d]: %d processes accessing shared pg 0 (%s)\n",
-                    pid, shmem_count(0), (char *)pg_addr);
+                out("child3[%d]: %d processes accessing shared pg %d (%s)\n",
+                    pid, shmem_count(pg_num), pg_num, (char *)pg_addr);
 
                 exit();
         }
@@ -83,11 +84,11 @@ int main(int argc, char *argv[])
                 exit();
         }
 
-        //pg_addr = shmem_access(0);
-        //strcpy((char *)pg_addr, "qux\0");
+        pg_addr = shmem_access(pg_num);
+        strcpy((char *)pg_addr, "qux\0");
 
-        out("parent[%d]: %d processes accessing shared pg 0 (%s)\n",
-            pid, shmem_count(0), (char *)pg_addr);
+        out("parent[%d]: %d processes accessing shared pg %d (%s)\n",
+            pid, shmem_count(pg_num), pg_num, (char *)pg_addr);
 
         return 0;
 }
