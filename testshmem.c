@@ -11,20 +11,15 @@
 * Testing Project 2 Part B:  shmem system calls
 */
 
-//#include "types.h"  // uint
-//#include "user.h"   // printf() and fork()
-//#include "defs.h"   // getproc(), strncpy()
-
 #include "param.h"
-#include "types.h"
+#include "types.h"  // uint
 #include "stat.h"
-#include "user.h"
+#include "user.h"   // fork(), exec()
 #include "fs.h"
 #include "fcntl.h"
 #include "syscall.h"
 #include "traps.h"
 #include "memlayout.h"
-
 
 #define NULL (void *)(0)
 #define stdout 1
