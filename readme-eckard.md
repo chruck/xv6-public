@@ -35,23 +35,3 @@ usys.S:
 vm.c:
 - Implementation of `sys_shmem_count()` and `sys_shmem_access()`
 functions.
-
----
-
-defs.h:
-- Prototyped `struct procinfo` and `getprocsinfo()` from `proc.c`.
-
-proc.c:
-- Created function `getprocsinfo()` that is used by the system call.
-This is where the majority of the stuff happens.
-
-proc.h:
-- Appended definition of `struct procinfo`.
-
-sysproc.c:
-- Added `getprocsinfo` syscall as `sys_getprocsinfo()`, which calls
-`getprocsinfo()`.
-
-user.h:
-- Added `struct procinfo` declaration.
-- Appended `getprocsinfo` prototype.
