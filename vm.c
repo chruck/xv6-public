@@ -415,7 +415,7 @@ sys_shmem_access(void)
                 return -1;
         }
 
-        page_addr = shmem_access(page_number);
+        page_addr = P2V(shmem_access(page_number));
 
         return (int) page_addr;
 }
