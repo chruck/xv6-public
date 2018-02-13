@@ -30,11 +30,11 @@ Segmentation fault
 #define stdout 1
 #define out(...) printf(stdout, __VA_ARGS__)
 
+int main(int argc, char **argv)
+{
         int *nil = NULL;
         char *null = NULL;
         char *something = "something";
-int main(int argc, char **argv)
-{
 
         //printf("NULL is '%s', but something is '%s'.\n", null, something);
         out("NULL is '%s', but something is '%s'.\n", &null, &something);
