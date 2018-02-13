@@ -21,6 +21,7 @@ Global variables
 `ioapic`:  ioapic.c, pointer to ioapic struct
 `ioapicid`:  mp.c, id of i/o?
 `kmem`:  kalloc.c, kernel memory?
+`kmap`:  vm.c, table of kernel mappings for every proc's page table
 `kpgdir`:  main.c/vm.c, a pde_t?  kernel page directory? for scheduler()
 `lapic`:  lapic.c, pointer to uint (i/o interrupts?)
 `log`:  log.c, simple log
