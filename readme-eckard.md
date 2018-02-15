@@ -1,6 +1,33 @@
-Changes made to original xv6 source code in order to add syscall
-`getprocsinfo()`:
+Changes made to original xv6 source code for Project 3
 ===
+
+Makefile:
+- Changed `CFLAGS`'s `-O2` to `-Og` for debugging.
+- Added `systhread.o` to `OBJS`
+
+readme-eckard.md:
+- This file, explaining all files that were changed or created.
+
+syscall.c:
+- Referenced external functions `sys_clone()` and `sys_join()`.
+- Appended `sys_clone` and `sys_join` to `syscalls`.
+
+syscall.h:
+- Set `SYS_clone` to `22`.
+- Set `SYS_join` to `23`.
+
+systhread.c:
+- Created to implement `sys_clone()` and `sys_thread()`.
+
+/*
+thread.c:
+- Created as a thread library
+*/
+
+usys.S:
+- Appended `clone` and `join` to `SYSCALL` macro calls.
+
+---
 
 NOTES:
 - `Project1.pdf` refers to `getprocsinfo()` and `getprocinfo()`, but
@@ -18,10 +45,6 @@ that it "returns the PID value and process name for each of the
 processes that exists in the system at the time of the call", thus
 requiring an "array".
 
-Makefile:
-- Appended `_testgetprocsinfo` to `UPROGS`.
-- Added `testgetprocsinfo.c` to `EXTRA`.
-
 defs.h:
 - Prototyped `struct procinfo` and `getprocsinfo()` from `proc.c`.
 
@@ -31,16 +54,6 @@ This is where the majority of the stuff happens.
 
 proc.h:
 - Appended definition of `struct procinfo`.
-
-readme-eckard.md:
-- This file, explaining all files that were changed or created.
-
-syscall.h:
-- Set `SYS_getprocsinfo` to `22`.
-
-syscall.c:
-- Referenced external function `sys_getprocsinfo()`.
-- Appended `sys_getprocsinfo` to `syscalls`.
 
 sysproc.c:
 - Added `getprocsinfo` syscall as `sys_getprocsinfo()`, which calls
@@ -53,5 +66,27 @@ user.h:
 - Added `struct procinfo` declaration.
 - Appended `getprocsinfo` prototype.
 
-usys.S:
-- Appended `getprocsinfo` to `SYSCALL` macro calls.
+===
+
+NOTES:
+
+Makefile:
+- Appended `_testgetprocsinfo` to `UPROGS`.
+- Added `testgetprocsinfo.c` to `EXTRA`.
+- Appended `_testderefnull` and `_testshmem` to `UPROGS`.
+- Added `testderefnull.c` and `testshmem.c` to `EXTRA`.
+
+proj2tests.c:
+- Program created to test Project 2 Part A and Part B modifications
+(`testderefnull` and `testshmem`).
+
+
+testderefnull.c:
+- Program created to test dereferencing a NULL pointer.
+
+testshmem.c:
+- Program created to have several tests against `shmem_*()` syscalls.
+
+vm.c:
+- Implementation of `sys_shmem_count()` and `sys_shmem_access()`
+functions.
