@@ -51,7 +51,7 @@ struct proc {
         struct inode *cwd;           // Current directory
         char name[16];               // Process name (debugging)
 // TODO:  Document, adjust fn's that use `struct proc`:
-        uint thread_num;             // Thread number
+        uint thread_id;              // Thread ID
 };
 
 // Process memory is laid out contiguously, low addresses first:
