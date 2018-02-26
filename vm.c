@@ -315,8 +315,10 @@ pde_t *copyuvm(pde_t * pgdir, uint sz)
         uint pa, i, flags;
         char *mem;
 
-        if ((d = setupkvm()) == 0)
+        if ((d = setupkvm()) == 0) {
                 return 0;
+        }
+
         for (i = 0; i < sz; i += PGSIZE) {
                 if ((pte = walkpgdir(pgdir, (void *)i, 0)) == 0)
                         panic("copyuvm: pte should exist");
@@ -332,7 +334,7 @@ pde_t *copyuvm(pde_t * pgdir, uint sz)
         }
         return d;
 
-      bad:
+bad:
         freevm(d);
         return 0;
 }
