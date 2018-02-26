@@ -76,14 +76,16 @@ static struct proc *allocproc(void)
 
         acquire(&ptable.lock);
 
-        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-                if (p->state == UNUSED)
+        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+                if (p->state == UNUSED) {
                         goto found;
+                }
+        }
 
         release(&ptable.lock);
         return 0;
 
-      found:
+found:
         p->state = EMBRYO;
         p->pid = nextpid++;
 
@@ -219,6 +221,7 @@ int fork(void)
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.
+// TODO:  Work the same with threads
 void exit(void)
 {
         struct proc *curproc = myproc();
@@ -263,6 +266,8 @@ void exit(void)
 
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
+// TODO:  wait for child proc that doesn't share addr space with this
+// proc.  Also, free addr space if this is last ref to it
 int wait(void)
 {
         struct proc *p;
@@ -517,3 +522,145 @@ void procdump(void)
                 cprintf("\n");
         }
 }
+
+// TODO:  Change from fork() to clone()
+int clone(void (*fcn)(void *), void *arg, void *stack)
+{
+        return 0;
+        //int fork(void)
+        {
+                int i, pid;
+                struct proc *newproc;
+                struct proc *curproc = myproc();
+
+                // Allocate process.
+                if ((newproc = allocproc()) == 0) {
+                        return -1;
+                }
+
+                // Copy process state from proc.
+                if ((newproc->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0) {
+                        kfree(newproc->kstack);
+                        newproc->kstack = 0;
+                        newproc->state = UNUSED;
+                        return -1;
+                }
+                newproc->sz = curproc->sz;
+                newproc->parent = curproc;
+                *newproc->tf = *curproc->tf;
+
+                // Clear %eax so that fork returns 0 in the child.
+                newproc->tf->eax = 0;
+
+                for (i = 0; i < NOFILE; i++) {
+                        if (curproc->ofile[i]) {
+                                newproc->ofile[i] = filedup(curproc->ofile[i]);
+                        }
+                }
+
+                newproc->cwd = idup(curproc->cwd);
+
+                safestrcpy(newproc->name, curproc->name, sizeof(curproc->name));
+
+                pid = newproc->pid;
+
+                acquire(&ptable.lock);
+
+                newproc->state = RUNNABLE;
+
+                release(&ptable.lock);
+
+                return pid;
+        }
+
+}
+
+// Syscall:  Create a kernel thread which shares the calling process'
+// addres space and file discriptors.  New process uses `stack` as its
+// user stack, which is passed arg and uses a fake return PC (0xffffffff).
+// Stack is 1 aligned page.  Thread starts executing at address of `fcn`.
+// Return is PID of new thread.
+// prototype:  int clone(void(*fcn)(void *), void *arg, void *stack)
+int sys_clone(void)
+{
+        int rc = 0;
+        void *arg = (void *)0;
+        void *stack = (void *)0;
+        void (*fcn)(void*) = (void *)0;
+
+        if (0 > (rc = argptr(0, (char **)fcn, sizeof(fcn)))) {
+                return rc;
+        }
+
+        if (0 > (rc = argptr(1, arg, sizeof(arg)))) {
+                return rc;
+        }
+
+        if (0 > (rc = argptr(2, stack, sizeof(stack)))) {
+                return rc;
+        }
+
+        return clone(fcn, arg, stack);
+}
+
+// TODO:  Change from wait() to join()
+int join(int pid)
+{
+        return 0;
+        //int wait(void)
+        {
+                struct proc *p;
+                int havekids, pid;
+                struct proc *curproc = myproc();
+
+                acquire(&ptable.lock);
+                for (;;) {
+                        // Scan through table looking for exited children.
+                        havekids = 0;
+                        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+                                if (p->parent != curproc)
+                                        continue;
+                                havekids = 1;
+                                if (p->state == ZOMBIE) {
+                                        // Found one.
+                                        pid = p->pid;
+                                        kfree(p->kstack);
+                                        p->kstack = 0;
+                                        freevm(p->pgdir);
+                                        p->pid = 0;
+                                        p->parent = 0;
+                                        p->name[0] = 0;
+                                        p->killed = 0;
+                                        p->state = UNUSED;
+                                        release(&ptable.lock);
+                                        return pid;
+                                }
+                        }
+
+                        // No point waiting if we don't have any children.
+                        if (!havekids || curproc->killed) {
+                                release(&ptable.lock);
+                                return -1;
+                        }
+                        // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+                        sleep(curproc, &ptable.lock);   //DOC: wait-sleep
+                }
+        }
+
+}
+
+// Syscall:  Wait for a kernel thread, then join to the parent.
+// Returns 0 (JOIN_SUCCESS) or -1 (JOIN_FAILURE)
+// prototype:  int join(int pid)
+int sys_join(void)
+{
+        int rc = 0;
+        int pid = 0;
+
+        if (0 > (rc = argint(0, &pid))) {
+                return rc;
+        }
+
+        return join(pid);
+}
+
