@@ -16,13 +16,20 @@
 
 #define NUM_CONS 2
 
+// TODO:  simple spinlock
 typedef int lock_t;
-typedef int kthread_t;
+// TODO:  kernel thread type
+typedef struct kthread {
+        uint pid;
+        uint parent_pid;
+        uint thread_num;
+} kthread_t;
 
 int init_lock(lock_t *lock);
+int lock_init(lock_t *lock);
 int lock_acquire(lock_t *lock);
 int lock_release(lock_t *lock);
-kthread_t thread_create(void consumer(void *arg), int []);
-int thread_join(kthread_t thread);
+struct kthread thread_create(void (*start_routine)(void *), void *arg);
+int thread_join(struct kthread thread);
 
 #endif  // kthreads_h
