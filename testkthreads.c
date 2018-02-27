@@ -27,7 +27,8 @@
 #include "user.h"
 #include "kthreads.h"
 
-#define LOCKS_ON 1
+//#define LOCKS_ON 1
+int LOCKS_ON = 1;
 #define NULL 0
 
 
@@ -48,9 +49,11 @@ void consumer(void* arg)
     {
         // not thread safe but give producers time
         while(things <= 0);
-        #if LOCKS_ON
+        //#if LOCKS_ON
+        if (LOCKS_ON) {
         lock_acquire(&lock);
-        #endif
+        //#endif
+        }
         if (things > 0)
         {
             // useful consumption of resources algorithm
@@ -58,9 +61,11 @@ void consumer(void* arg)
             --things;
             ++consumed;
         }
-        #if LOCKS_ON
+        //#if LOCKS_ON
+        if (LOCKS_ON) {
         lock_release(&lock);
-        #endif
+        //#endif
+        }
     }
     
     printf(1, "consumer %d consumed: %d\n", *(int*)arg, consumed);
@@ -77,9 +82,11 @@ void producer(void* arg)
     int cont = 1;
     while (cont)
     {
-        #if LOCKS_ON
+        //#if LOCKS_ON
+        if (LOCKS_ON) {
         lock_acquire(&lock);
-        #endif
+        //#endif
+        }
         // magical producing algorithm
         if (things_made < TOTAL_PRODUCTS)
         {
@@ -90,9 +97,11 @@ void producer(void* arg)
         {
             cont = 0;
         }
-        #if LOCKS_ON
+        //#if LOCKS_ON
+        if (LOCKS_ON) {
         lock_release(&lock);
-        #endif
+        //#endif
+        }
     }
     exit();
 }
@@ -104,6 +113,10 @@ int main(void)
     int indices[NUM_CONS];
     kthread_t producers[NUM_PROD];
     kthread_t consumers[NUM_CONS];
+
+    for (LOCKS_ON = 0; 2 > LOCKS_ON; ++LOCKS_ON) {
+            printf(1, "--- LOCKS_ON = %d ---\n", LOCKS_ON);
+
     for (i = 0; i < NUM_CONS; i++)
     {
         indices[i] = i;
@@ -132,5 +145,6 @@ int main(void)
     {
         printf(1, "Test passed!\n");
     }
+    } // LOCKS_ON
     exit();
 }
