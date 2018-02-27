@@ -17,7 +17,7 @@
 #define NUM_CONS 2
 
 // TODO:  simple spinlock
-typedef int lock_t;
+typedef uint lock_t;
 // TODO:  kernel thread type
 typedef struct kthread {
         uint pid;
