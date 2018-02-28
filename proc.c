@@ -493,12 +493,12 @@ int kill(int pid)
 void procdump(void)
 {
         static char *states[] = {
-                [UNUSED] "unused",
-                [EMBRYO] "embryo",
+                [UNUSED]   "unused",
+                [EMBRYO]   "embryo",
                 [SLEEPING] "sleep ",
                 [RUNNABLE] "runble",
-                [RUNNING] "run   ",
-                [ZOMBIE] "zombie"
+                [RUNNING]  "run   ",
+                [ZOMBIE]   "zombie"
         };
         int i;
         struct proc *p;
@@ -526,7 +526,6 @@ void procdump(void)
 // TODO:  Change from fork() to clone()
 int clone(void (*fcn)(void *), void *arg, void *stack)
 {
-        return 0;
         //int fork(void)
         {
                 int i, pid;
@@ -573,6 +572,7 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
                 return pid;
         }
 
+        return 0;
 }
 
 // Syscall:  Create a kernel thread which shares the calling process'
@@ -606,7 +606,6 @@ int sys_clone(void)
 // TODO:  Change from wait() to join()
 int join(int pid)
 {
-        return 0;
         //int wait(void)
         {
                 struct proc *p;
@@ -647,6 +646,7 @@ int join(int pid)
                 }
         }
 
+        return 0;
 }
 
 // Syscall:  Wait for a kernel thread, then join to the parent.
@@ -663,4 +663,3 @@ int sys_join(void)
 
         return join(pid);
 }
-
