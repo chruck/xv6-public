@@ -75,7 +75,7 @@ void popcli(void)
         //if (--mycpu()->ncli < 0)
                 //panic("popcli");
         //if (mycpu()->ncli == 0 && mycpu()->intena)
-                //sti();
+                sti();
 }
 
 int lock_acquire(lock_t *lock)
@@ -149,7 +149,6 @@ struct kthread thread_create(void (*start_routine)(void *), void *arg)
 
         // TODO:  use #define PGROUNDUP(sz)  (((sz)+PGSIZE-1) &
         // ~(PGSIZE-1)) for malloc'd page (needs to be aligned)
-
 
         // create child thread and get it running
         uint pid = clone(start_routine, arg, stack);
