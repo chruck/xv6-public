@@ -11,7 +11,7 @@ but the test code calls `init_lock()`, the latter simply calls the former.
 Makefile:
 - Changed `CFLAGS`'s `-O2` to `-Og` for debugging.
 - Added `kthreads.o` to `ULIB`.
-- Added `_testkthreads` to `UPROGS`.
+- Added `_testkthreads`, `_testthr` to `UPROGS`.
 - Added `testkthreads.c` to `EXTRA`.
 
 kthreads.[ch]:
@@ -37,6 +37,9 @@ syscall.h:
 
 testkthreads.c:
 - Program created by our TA, Tyler Allen to test Project 3.
+
+testthr.c:
+- Program created for more tests for Project 3.
 
 usys.S:
 - Appended `clone` and `join` to `SYSCALL` macro calls.
