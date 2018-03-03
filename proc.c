@@ -15,6 +15,7 @@ struct {
 static struct proc *initproc;
 
 int nextpid = 1;
+int nextthreadid = 1;
 extern void forkret(void);
 extern void trapret(void);
 
@@ -524,32 +525,80 @@ void procdump(void)
 }
 
 // TODO:  Change from fork() to clone()
+// Most of clone() was based on fork()
 int clone(void (*fcn)(void *), void *arg, void *stack)
 {
         //int fork(void)
         {
                 int i, pid;
+                //uint ustack[] = {0xffffffff, (uint)arg};
                 struct proc *newproc;
                 struct proc *curproc = myproc();
 
-                // Allocate process.
-                if ((newproc = allocproc()) == 0) {
+                // Check stack alignment
+                if ((0 != ((uint)stack % PGSIZE)
+                    || PGSIZE > (curproc->sz - (uint)stack))) {
                         return -1;
                 }
 
+                // Allocate process.
+                if (0 == (newproc = allocproc())) {
+                        return -1;
+                }
+
+                // Thread has same code and data as parent, but
+                // different stack:
+
+                newproc->sz = curproc->sz;
+
                 // Copy process state from proc.
+                /*
                 if ((newproc->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0) {
                         kfree(newproc->kstack);
                         newproc->kstack = 0;
                         newproc->state = UNUSED;
                         return -1;
                 }
-                newproc->sz = curproc->sz;
+                */
+
+                newproc->pgdir = curproc->pgdir;
+
+                //newproc->threadstack = (uint)stack;
+                //newproc->threadstack = (char *)stack;
+                //newproc->kstack = (char *)stack;
+                newproc->kstack = stack;
+
+                // state done at the end, locked
+
+                // TODO:  error if multiple procs (threads) w/ same pid?
+                // Use pid from parent thread
+                pid = newproc->pid = curproc->pid;
+
                 newproc->parent = curproc;
+
+                // trapframe same, except for a few things
                 *newproc->tf = *curproc->tf;
+                newproc->tf->ebp = newproc->tf->esp;
 
                 // Clear %eax so that fork returns 0 in the child.
                 newproc->tf->eax = 0;
+
+                newproc->tf->eip = (uint)fcn;
+
+                /*
+                //newproc->tf->esp = (uint)stack+PGSIZE;
+                // TODO:  (2)*4 is some "magic number"
+                //newproc->tf->esp = stack + PGSIZE - (2)*4;
+                newproc->tf->esp = (uint)stack + PGSIZE - 2 * sizeof(void *);
+
+                //ustack[0] = 0xffffffff;
+                //ustack[1] = (uint)arg;
+                // TODO:  (2)*4 is some "magic number"
+                copyout(newproc->pgdir, newproc->tf->esp, ustack, 2 * sizeof(void *));
+                */
+                newproc->tf->esp = (uint)stack ;
+
+                // context, chan, killed is part of stack
 
                 for (i = 0; i < NOFILE; i++) {
                         if (curproc->ofile[i]) {
@@ -561,7 +610,9 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
 
                 safestrcpy(newproc->name, curproc->name, sizeof(curproc->name));
 
-                pid = newproc->pid;
+                newproc->threadid = nextthreadid++;
+
+                // TODO:  threadstack?  (commented above, kstack)
 
                 acquire(&ptable.lock);
 
@@ -588,14 +639,17 @@ int sys_clone(void)
         void *stack = (void *)0;
         void (*fcn)(void*) = (void *)0;
 
+        //if (0 > (rc = argptr(0, (void *)&fcn, sizeof(fcn)))) {
         if (0 > (rc = argptr(0, (char **)fcn, sizeof(fcn)))) {
                 return rc;
         }
 
+        //if (0 > (rc = argptr(1, (void *)&arg, sizeof(arg)))) {
         if (0 > (rc = argptr(1, arg, sizeof(arg)))) {
                 return rc;
         }
 
+        //if (0 > (rc = argptr(2, (void *)&stack, sizeof(stack)))) {
         if (0 > (rc = argptr(2, stack, sizeof(stack)))) {
                 return rc;
         }
