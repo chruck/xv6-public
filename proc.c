@@ -541,10 +541,6 @@ static inline void cp_code_and_data(struct proc *oldproc,
          */
 
         newproc->pgdir = oldproc->pgdir;
-
-        // TODO:  error if multiple procs (threads) w/ same pid?
-        // Use pid from parent thread
-        newproc->pid = oldproc->pid;
         *newproc->tf = *oldproc->tf;
 
         for (int i = 0; i < NOFILE; i++) {
@@ -565,7 +561,7 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
 {
         int pid;
 
-        //uint ustack[] = {0xffffffff, (uint)arg};
+        uint ustack[] = {0xffffffff, (uint)arg};
         struct proc *newproc;
         struct proc *curproc = myproc();
 
@@ -602,6 +598,7 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
         newproc->tf->eax = 0;
         newproc->tf->eip = (uint) fcn;
         /*
+           */
            //newproc->tf->esp = (uint)stack+PGSIZE;
            // TODO:  (2)*4 is some "magic number"
            //newproc->tf->esp = stack + PGSIZE - (2)*4;
@@ -611,6 +608,7 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
            //ustack[1] = (uint)arg;
            // TODO:  (2)*4 is some "magic number"
            copyout(newproc->pgdir, newproc->tf->esp, ustack, 2 * sizeof(void *));
+           /*
          */
         newproc->tf->esp = (uint) stack;
 
@@ -667,18 +665,32 @@ int join(int pid)
         //int wait(void)
         {
                 struct proc *p;
-                int havekids, pid;
+                //int havekids, pid;
+                int exists = FALSE;
                 struct proc *curproc = myproc();
 
                 acquire(&ptable.lock);
 
-                while (TRUE) {
-                        // Scan through table looking for exited children.
-                        havekids = 0;
+                do {
+                        // Scan through table looking for child thread.
+                        //havekids = 0;
+                        exists = FALSE;
+
                         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-                                if (p->parent != curproc)
-                                        continue;
-                                havekids = 1;
+                                //if (p->parent != curproc)
+                                if (p->pid == pid) {
+                                        if (p->parent != curproc) {
+                                                release(&ptable.lock);
+                                                return RC_ERR;
+                                        }
+                                        //continue;
+                                        // found it!
+                                        exists = TRUE;
+                                        break;
+                                }
+
+                                /*
+                                //havekids = 1;
                                 if (p->state == ZOMBIE) {
                                         // Found one.
                                         pid = p->pid;
@@ -693,19 +705,26 @@ int join(int pid)
                                         release(&ptable.lock);
                                         return pid;
                                 }
+                                */
                         }
 
+                        /*
                         // No point waiting if we don't have any children.
                         if (!havekids || curproc->killed) {
                                 release(&ptable.lock);
                                 return -1;
                         }
-                        // Wait for children to exit.  (See wakeup1 call in proc_exit.)
-                        sleep(curproc, &ptable.lock);   //DOC: wait-sleep
-                }
+                        */
+
+                        // Wait for child thread to exit.  (See wakeup1 call in proc_exit.)
+                        if (exists) {
+                                sleep(curproc, &ptable.lock);
+                        }
+                } while (exists);
         }
 
-        return 0;
+        release(&ptable.lock);
+        return SUCCESS;
 }
 
 // Syscall:  Wait for a kernel thread, then join to the parent.
