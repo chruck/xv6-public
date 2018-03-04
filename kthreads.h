@@ -14,7 +14,7 @@
 #ifndef kthreads_h
 #define kthreads_h
 
-#define NUM_CONS 2
+#define NULL (void *)0
 
 // TODO:  simple spinlock
 typedef uint lock_t;
