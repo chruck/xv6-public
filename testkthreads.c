@@ -113,7 +113,7 @@ int main(void)
     kthread_t producers[NUM_PROD];
     kthread_t consumers[NUM_CONS];
 
-    for (LOCKS_ON = 0; 2 > LOCKS_ON; ++LOCKS_ON) {
+    for (LOCKS_ON = 1; -1 < LOCKS_ON; --LOCKS_ON) {
             printf(1, "--- LOCKS_ON = %d ---\n", LOCKS_ON);
 
     for (i = 0; i < NUM_CONS; i++)
