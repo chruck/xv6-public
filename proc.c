@@ -524,106 +524,108 @@ void procdump(void)
         }
 }
 
+static inline void cp_code_and_data(struct proc *oldproc,
+                                    struct proc *newproc)
+{
+        newproc->sz = oldproc->sz;
+
+        // Copy process state from proc.
+        /*
+           if ((newproc->pgdir = copyuvm(oldproc->pgdir, oldproc->sz)) == 0) {
+           kfree(newproc->kstack);
+           newproc->kstack = 0;
+           newproc->state = UNUSED;
+           return -1;
+           }
+         */
+
+        newproc->pgdir = oldproc->pgdir;
+
+        // TODO:  error if multiple procs (threads) w/ same pid?
+        // Use pid from parent thread
+        newproc->pid = oldproc->pid;
+        *newproc->tf = *oldproc->tf;
+
+        for (int i = 0; i < NOFILE; i++) {
+                if (oldproc->ofile[i]) {
+                        newproc->ofile[i] = filedup(oldproc->ofile[i]);
+                }
+        }
+
+        newproc->cwd = idup(oldproc->cwd);
+
+        safestrcpy(newproc->name, oldproc->name, sizeof(oldproc->name));
+
+}
+
 // TODO:  Change from fork() to clone()
 // Most of clone() was based on fork()
 int clone(void (*fcn)(void *), void *arg, void *stack)
 {
-        //int fork(void)
-        {
-                int i, pid;
-                //uint ustack[] = {0xffffffff, (uint)arg};
-                struct proc *newproc;
-                struct proc *curproc = myproc();
+        int pid;
 
-                // Check stack alignment
-                if ((0 != ((uint)stack % PGSIZE)
-                    || PGSIZE > (curproc->sz - (uint)stack))) {
-                        return -1;
-                }
+        //uint ustack[] = {0xffffffff, (uint)arg};
+        struct proc *newproc;
+        struct proc *curproc = myproc();
 
-                // Allocate process.
-                if (0 == (newproc = allocproc())) {
-                        return -1;
-                }
-
-                // Thread has same code and data as parent, but
-                // different stack:
-
-                newproc->sz = curproc->sz;
-
-                // Copy process state from proc.
-                /*
-                if ((newproc->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0) {
-                        kfree(newproc->kstack);
-                        newproc->kstack = 0;
-                        newproc->state = UNUSED;
-                        return -1;
-                }
-                */
-
-                newproc->pgdir = curproc->pgdir;
-
-                //newproc->threadstack = (uint)stack;
-                //newproc->threadstack = (char *)stack;
-                //newproc->kstack = (char *)stack;
-                newproc->kstack = stack;
-
-                // state done at the end, locked
-
-                // TODO:  error if multiple procs (threads) w/ same pid?
-                // Use pid from parent thread
-                pid = newproc->pid = curproc->pid;
-
-                newproc->parent = curproc;
-
-                // trapframe same, except for a few things
-                *newproc->tf = *curproc->tf;
-                newproc->tf->ebp = newproc->tf->esp;
-
-                // Clear %eax so that fork returns 0 in the child.
-                newproc->tf->eax = 0;
-
-                newproc->tf->eip = (uint)fcn;
-
-                /*
-                //newproc->tf->esp = (uint)stack+PGSIZE;
-                // TODO:  (2)*4 is some "magic number"
-                //newproc->tf->esp = stack + PGSIZE - (2)*4;
-                newproc->tf->esp = (uint)stack + PGSIZE - 2 * sizeof(void *);
-
-                //ustack[0] = 0xffffffff;
-                //ustack[1] = (uint)arg;
-                // TODO:  (2)*4 is some "magic number"
-                copyout(newproc->pgdir, newproc->tf->esp, ustack, 2 * sizeof(void *));
-                */
-                newproc->tf->esp = (uint)stack ;
-
-                // context, chan, killed is part of stack
-
-                for (i = 0; i < NOFILE; i++) {
-                        if (curproc->ofile[i]) {
-                                newproc->ofile[i] = filedup(curproc->ofile[i]);
-                        }
-                }
-
-                newproc->cwd = idup(curproc->cwd);
-
-                safestrcpy(newproc->name, curproc->name, sizeof(curproc->name));
-
-                newproc->threadid = nextthreadid++;
-
-                // TODO:  threadstack?  (commented above, kstack)
-
-                acquire(&ptable.lock);
-
-                newproc->state = RUNNABLE;
-
-                release(&ptable.lock);
-
-                return pid;
+        // Check stack alignment
+        if ((0 != ((uint) stack % PGSIZE)
+             || PGSIZE > (curproc->sz - (uint) stack))) {
+                return -1;
+        }
+        // Allocate process.
+        if (0 == (newproc = allocproc())) {
+                return -1;
         }
 
-        return 0;
+        // A thread has same code and data as parent, but
+        // different stack:
+        cp_code_and_data(curproc, newproc);
+
+        //newproc->threadstack = (uint)stack;
+        //newproc->threadstack = (char *)stack;
+        //newproc->kstack = (char *)stack;
+        newproc->kstack = stack;
+
+        // state done at the end, locked
+
+        // TODO:  error if multiple procs (threads) w/ same pid?
+        // Use pid from parent thread
+        pid = newproc->pid;
+
+        newproc->parent = curproc;
+
+        // trapframe same, except for a few things
+        newproc->tf->ebp = newproc->tf->esp;
+        // Clear %eax so that clone (fork) returns 0 in the child.
+        newproc->tf->eax = 0;
+        newproc->tf->eip = (uint) fcn;
+        /*
+           //newproc->tf->esp = (uint)stack+PGSIZE;
+           // TODO:  (2)*4 is some "magic number"
+           //newproc->tf->esp = stack + PGSIZE - (2)*4;
+           newproc->tf->esp = (uint)stack + PGSIZE - 2 * sizeof(void *);
+
+           //ustack[0] = 0xffffffff;
+           //ustack[1] = (uint)arg;
+           // TODO:  (2)*4 is some "magic number"
+           copyout(newproc->pgdir, newproc->tf->esp, ustack, 2 * sizeof(void *));
+         */
+        newproc->tf->esp = (uint) stack;
+
+        // context, chan, killed is part of stack
+
+        newproc->threadid = nextthreadid++;
+
+        // TODO:  threadstack?  (commented above, kstack)
+
+        acquire(&ptable.lock);
+
+        newproc->state = RUNNABLE;
+
+        release(&ptable.lock);
+
+        return pid;
 }
 
 // Syscall:  Create a kernel thread which shares the calling process'
