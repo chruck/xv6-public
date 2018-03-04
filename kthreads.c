@@ -33,6 +33,9 @@ int init_lock(lock_t *lock)
         // from spinlock.c:
 int lock_init(lock_t *lock)
 {
+        if (NULL == lock) {
+                return -1;
+        }
 
         //void initlock(struct spinlock *lk, char *name)
         //{
@@ -42,13 +45,13 @@ int lock_init(lock_t *lock)
                 //lk->cpu = 0;
         //}
 
-        return (int)*lock;
+        return 0;
 }
 
 // from spinlock.c:
 // Check whether this cpu is holding the lock.
 //int holding(struct spinlock *lock)
-int holding(lock_t *lock)
+static inline int holding(lock_t *lock)
 {
         //return lock->locked && lock->cpu == mycpu();
         return *lock;
@@ -57,7 +60,7 @@ int holding(lock_t *lock)
 // Pushcli/popcli are like cli/sti except that they are matched:
 // it takes two popcli to undo two pushcli.  Also, if interrupts
 // are off, then pushcli, popcli leaves them off.
-void pushcli(void)
+static inline void pushcli(void)
 {
         //int eflags;
 
@@ -68,7 +71,7 @@ void pushcli(void)
         //mycpu()->ncli += 1;
 }
 
-void popcli(void)
+static inline void popcli(void)
 {
         //if (readeflags() & FL_IF)
                 //panic("popcli - interruptible");
@@ -80,6 +83,10 @@ void popcli(void)
 
 int lock_acquire(lock_t *lock)
 {
+        if (NULL == lock) {
+                return -1;
+        }
+
         // from spinlock.c:
         //void acquire(struct spinlock *lock)
         {
@@ -111,6 +118,10 @@ int lock_acquire(lock_t *lock)
 
 int lock_release(lock_t *lock)
 {
+        if (NULL == lock) {
+                return -1;
+        }
+
         // from spinlock.c:
         //void release(struct spinlock *lock)
         {
@@ -143,9 +154,14 @@ int lock_release(lock_t *lock)
 
 struct kthread thread_create(void (*start_routine)(void *), void *arg)
 {
+        struct kthread new_thread = {0};
+
+        if (NULL == start_routine) {
+                return new_thread;
+        }
+
         // TODO:  create new user stack
         void *stack = malloc(PGSIZE);
-        struct kthread new_thread;
 
         // TODO:  use #define PGROUNDUP(sz)  (((sz)+PGSIZE-1) &
         // ~(PGSIZE-1)) for malloc'd page (needs to be aligned)
@@ -164,6 +180,10 @@ int thread_join(struct kthread thread)
 
         // TODO:  Parent pid?
         rc = join(thread.pid);
+
+        if (rc) {
+                return rc;
+        }
 
         // TODO:  free user stack
 
