@@ -25,6 +25,7 @@
 #include "types.h"
 #include "stat.h"
 #include "user.h"
+#include "defines.h"   // NULL, TRUE, FALSE, SUCCESS, RC_ERR, STDOUT
 #include "kthreads.h"
 
 //#define LOCKS_ON 1
