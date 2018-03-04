@@ -29,8 +29,6 @@
 
 //#define LOCKS_ON 1
 int LOCKS_ON = 1;
-#define NULL 0
-
 
 // global lock for product
 lock_t lock;
