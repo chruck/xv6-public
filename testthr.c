@@ -63,7 +63,8 @@ int testnullthread(char *err)
 
         struct kthread emptythr = {0};
         if (-1 != (rc = thread_join(emptythr))) {
-                strcpy(err, "err:  thread_join() accepts NULL for struct kthread.\n");
+                strcpy(err, "err:  thread_join() accepts NULL for "
+                            "struct  kthread.\n");
                 return -8;
         }
 
@@ -72,18 +73,17 @@ int testnullthread(char *err)
 
 int testthread_create(char *err)
 {
-        int rc = SUCCESS;
         kthread_t thr = thread_create(NULL, NULL);
 
-        if (0 == thr.pid) {
-                strcpy(err, "Empty thread_create() returned PID 0, weird\n");
-        } else if (0 > thr.pid) {
-                strcpy(err, "Empty thread_create() returned PID, as expected\n");
-        } else {
-                strcpy(err, "Empty thread_create() error:  returned PID\n");
+        if ((-1 != thr.pid)
+            && (-1 != thr.parent_pid)
+            && (-1 != thr.thread_num)) {
+                strcpy(err, "Empty thread_create() returned a real "
+                            "thread, weird\n");
+                return -9;
         }
 
-        return !rc;
+        return SUCCESS;
 }
 
 int main(void)
@@ -110,6 +110,8 @@ int main(void)
                 out("testthread_create() failed, rc=%d:\n\t%s", rc, err);
                 return rc;
         }
+
+        out("All tests passed!\n");
 
         return rc;
 }
