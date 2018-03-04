@@ -5,6 +5,7 @@
 #include "mmu.h"
 #include "x86.h"
 #include "proc.h"
+#include "defines.h"   // NULL, TRUE, FALSE, SUCCESS, RC_ERR, STDOUT
 #include "spinlock.h"
 
 struct {
@@ -660,6 +661,7 @@ int sys_clone(void)
 }
 
 // TODO:  Change from wait() to join()
+// Based on wait()
 int join(int pid)
 {
         //int wait(void)
@@ -669,7 +671,8 @@ int join(int pid)
                 struct proc *curproc = myproc();
 
                 acquire(&ptable.lock);
-                for (;;) {
+
+                while (TRUE) {
                         // Scan through table looking for exited children.
                         havekids = 0;
                         for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
