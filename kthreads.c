@@ -155,7 +155,7 @@ int lock_release(lock_t *lock)
 
 struct kthread thread_create(void (*start_routine)(void *), void *arg)
 {
-        struct kthread new_thread = {0};
+        struct kthread new_thread = {-1, -1, -1};
 
         if (NULL == start_routine) {
                 return new_thread;
