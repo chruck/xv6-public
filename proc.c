@@ -234,10 +234,13 @@ void exit(void)
                 panic("init exiting");
 
         // Close all open files.
-        for (fd = 0; fd < NOFILE; fd++) {
-                if (curproc->ofile[fd]) {
-                        fileclose(curproc->ofile[fd]);
-                        curproc->ofile[fd] = 0;
+        // unless it is a thread
+        if (0 != curproc->threadid) {
+                for (fd = 0; fd < NOFILE; fd++) {
+                        if (curproc->ofile[fd]) {
+                                fileclose(curproc->ofile[fd]);
+                                curproc->ofile[fd] = 0;
+                        }
                 }
         }
 
@@ -285,18 +288,20 @@ int wait(void)
                                 continue;
                         havekids = 1;
                         if (p->state == ZOMBIE) {
-                                // Found one.
-                                pid = p->pid;
-                                kfree(p->kstack);
-                                p->kstack = 0;
-                                freevm(p->pgdir);
-                                p->pid = 0;
-                                p->parent = 0;
-                                p->name[0] = 0;
-                                p->killed = 0;
-                                p->state = UNUSED;
-                                release(&ptable.lock);
-                                return pid;
+                                if (0 != curproc->threadid) {
+                                        // Found one.
+                                        pid = p->pid;
+                                        kfree(p->kstack);
+                                        p->kstack = 0;
+                                        freevm(p->pgdir);
+                                        p->pid = 0;
+                                        p->parent = 0;
+                                        p->name[0] = 0;
+                                        p->killed = 0;
+                                        p->state = UNUSED;
+                                        release(&ptable.lock);
+                                        return pid;
+                                }
                         }
                 }
 
@@ -662,66 +667,64 @@ int sys_clone(void)
 // Based on wait()
 int join(int pid)
 {
-        //int wait(void)
-        {
-                struct proc *p;
-                //int havekids, pid;
-                int exists = FALSE;
-                struct proc *curproc = myproc();
+        struct proc *p;
 
-                acquire(&ptable.lock);
+        //int havekids, pid;
+        int exists = FALSE;
+        struct proc *curproc = myproc();
 
-                do {
-                        // Scan through table looking for child thread.
-                        //havekids = 0;
-                        exists = FALSE;
+        acquire(&ptable.lock);
 
-                        for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-                                //if (p->parent != curproc)
-                                if (p->pid == pid) {
-                                        if (p->parent != curproc) {
-                                                release(&ptable.lock);
-                                                return RC_ERR;
-                                        }
-                                        //continue;
-                                        // found it!
-                                        exists = TRUE;
-                                        break;
-                                }
+        do {
+                // Scan through table looking for child thread.
+                //havekids = 0;
+                exists = FALSE;
 
-                                /*
-                                //havekids = 1;
-                                if (p->state == ZOMBIE) {
-                                        // Found one.
-                                        pid = p->pid;
-                                        kfree(p->kstack);
-                                        p->kstack = 0;
-                                        freevm(p->pgdir);
-                                        p->pid = 0;
-                                        p->parent = 0;
-                                        p->name[0] = 0;
-                                        p->killed = 0;
-                                        p->state = UNUSED;
+                for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+                        //if (p->parent != curproc)
+                        if (p->pid == pid) {
+                                if (p->parent != curproc) {
                                         release(&ptable.lock);
-                                        return pid;
+                                        return RC_ERR;
                                 }
-                                */
+                                //continue;
+                                // found it!
+                                exists = TRUE;
+                                break;
                         }
 
                         /*
-                        // No point waiting if we don't have any children.
-                        if (!havekids || curproc->killed) {
-                                release(&ptable.lock);
-                                return -1;
-                        }
-                        */
+                           //havekids = 1;
+                           if (p->state == ZOMBIE) {
+                           // Found one.
+                           pid = p->pid;
+                           kfree(p->kstack);
+                           p->kstack = 0;
+                           freevm(p->pgdir);
+                           p->pid = 0;
+                           p->parent = 0;
+                           p->name[0] = 0;
+                           p->killed = 0;
+                           p->state = UNUSED;
+                           release(&ptable.lock);
+                           return pid;
+                           }
+                         */
+                }
 
-                        // Wait for child thread to exit.  (See wakeup1 call in proc_exit.)
-                        if (exists) {
-                                sleep(curproc, &ptable.lock);
-                        }
-                } while (exists);
-        }
+                /*
+                   // No point waiting if we don't have any children.
+                   if (!havekids || curproc->killed) {
+                   release(&ptable.lock);
+                   return -1;
+                   }
+                 */
+
+                // Wait for child thread to exit.  (See wakeup1 call in proc_exit.)
+                if (exists) {
+                        sleep(curproc, &ptable.lock);
+                }
+        } while (exists);
 
         release(&ptable.lock);
         return SUCCESS;
