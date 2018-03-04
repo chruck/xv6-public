@@ -171,6 +171,17 @@ struct kthread thread_create(void (*start_routine)(void *), void *arg)
         uint pid = clone(start_routine, arg, stack);
 
         new_thread.pid = pid;
+        /*
+        new_thread.parent_pid = my_proc()->pid;
+
+        acquire(&ptable.lock);
+        for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+                if (p->pid == pid) {
+                        new_thread.thread_num = p->threadid;
+                }
+        }
+        release(&ptable.lock);
+        */
 
         return new_thread;
 }
