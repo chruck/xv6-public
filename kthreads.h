@@ -14,8 +14,6 @@
 #ifndef kthreads_h
 #define kthreads_h
 
-#define NULL (void *)0
-
 // TODO:  simple spinlock
 typedef uint lock_t;
 // TODO:  kernel thread type
