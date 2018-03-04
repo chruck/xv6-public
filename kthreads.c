@@ -20,7 +20,8 @@
 //#include "proc.h"       // clone
 #include "x86.h"        // cli(), sti()
 //#include "defs.h"       // panic()
-#include "kthreads.h"
+#include "defines.h"   // NULL, TRUE, FALSE, SUCCESS, RC_ERR, STDOUT
+#include "kthreads.h"  // lock_t, thread_t
 
 // Simple spin lock:
 // Code for spin lock based on simplification of xv6's spinlock.c
