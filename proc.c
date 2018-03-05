@@ -288,7 +288,7 @@ int wait(void)
                                 continue;
                         havekids = 1;
                         if (p->state == ZOMBIE) {
-                                if (0 != curproc->threadid) {
+                                //if (0 != curproc->threadid) {
                                         // Found one.
                                         pid = p->pid;
                                         kfree(p->kstack);
@@ -301,7 +301,7 @@ int wait(void)
                                         p->state = UNUSED;
                                         release(&ptable.lock);
                                         return pid;
-                                }
+                                //}
                         }
                 }
 
