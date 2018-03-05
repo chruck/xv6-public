@@ -123,7 +123,6 @@ void yield(void);
 
 // swtch.S
 void swtch(struct context **, struct context *);
-void thread_swtch(struct context **, struct context *);
 
 // spinlock.c
 void acquire(struct spinlock *);
