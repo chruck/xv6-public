@@ -1,4 +1,15 @@
-// Seemingly standard #defines
+/**
+* @file defines.h
+* @author Jas Eckard <eckard@clemson.edu>
+*
+* @section LICENSE
+*
+* (GPL license)
+*
+* @section DESCRIPTION
+*
+* This file has seemingly standard #define's.
+*/
 
 #define NULL ((void *)0)
 
