@@ -684,6 +684,8 @@ int join(int pid)
                 }
         } while (exists);
 
+        kfree(curproc->kstack);
+
         release(&ptable.lock);
         return SUCCESS;
 }
