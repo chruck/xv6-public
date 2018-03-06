@@ -2,13 +2,13 @@ Changes made to original xv6 source code for Project 3
 ===
 
 NOTES:
-Project 3 refers to a thread struct called `kthread`, and the TA test
+- Project 3 refers to a thread struct called `kthread`, and the TA test
 code `testkthreads.c` uses the naming convention of `kthread_t`, so I
-have created both, a `struct kthread` that has a typedef of
-`kthread_t`.  Also, because the assignment asked for `lock_init()`,
-but the test code calls `init_lock()`, the latter simply calls the
-former.  Also, I couldn't stand it any longer, I had to have K&R-style
-indentation:  The only difference to the files not mentioned below is
+have created both, a `struct kthread` that has a typedef of `kthread_t`.
+- Also, because the assignment asked for `lock_init()`, but the test
+code calls `init_lock()`, the latter simply calls the former.
+- Also, I couldn't stand it any longer, I had to have K&R-style
+indentation: The only difference to the files not mentioned below is
 indentation, for my own readability.
 
 Makefile:
