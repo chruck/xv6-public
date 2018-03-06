@@ -50,10 +50,7 @@ struct proc {
         struct file *ofile[NOFILE];  // Open files
         struct inode *cwd;           // Current directory
         char name[16];               // Process name (debugging)
-// TODO:  Document, adjust fn's that use `struct proc`:
         uint threadid;               // Thread ID
-        //uint threadstack;            // Thread stack
-        char *threadstack;           // Thread stack
 };
 
 // Process memory is laid out contiguously, low addresses first:
