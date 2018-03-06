@@ -560,13 +560,12 @@ static inline void cp_code_and_data(struct proc *oldproc,
 
 }
 
-// TODO:  Change from fork() to clone()
 // Most of clone() was based on fork()
 int clone(void (*fcn)(void *), void *arg, void *stack)
 {
         int pid;
 
-        uint ustack[] = {0xffffffff, (uint)arg};
+        //uint thr_stack[] = {0xffffffff, (uint)arg};
         struct proc *newproc;
         struct proc *curproc = myproc();
 
@@ -575,6 +574,7 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
              || PGSIZE > (curproc->sz - (uint) stack))) {
                 return -1;
         }
+
         // Allocate process.
         if (0 == (newproc = allocproc())) {
                 return -1;
@@ -587,7 +587,8 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
         //newproc->threadstack = (uint)stack;
         //newproc->threadstack = (char *)stack;
         //newproc->kstack = (char *)stack;
-        newproc->kstack = stack;
+        //newproc->kstack = stack;
+        //newproc->threadstack = stack;
 
         // state done at the end, locked
 
@@ -597,31 +598,59 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
 
         newproc->parent = curproc;
 
+        /*
         // trapframe same, except for a few things
         newproc->tf->ebp = newproc->tf->esp;
         // Clear %eax so that clone (fork) returns 0 in the child.
         newproc->tf->eax = 0;
         newproc->tf->eip = (uint) fcn;
-        /*
            */
+        /*
            //newproc->tf->esp = (uint)stack+PGSIZE;
            // TODO:  (2)*4 is some "magic number"
            //newproc->tf->esp = stack + PGSIZE - (2)*4;
            newproc->tf->esp = (uint)stack + PGSIZE - 2 * sizeof(void *);
 
-           //ustack[0] = 0xffffffff;
-           //ustack[1] = (uint)arg;
+           //thr_stack[0] = 0xffffffff;
+           //thr_stack[1] = (uint)arg;
            // TODO:  (2)*4 is some "magic number"
-           copyout(newproc->pgdir, newproc->tf->esp, ustack, 2 * sizeof(void *));
-           /*
+           copyout(newproc->pgdir, newproc->tf->esp, thr_stack, 2 * sizeof(void *));
          */
+           /*
         newproc->tf->esp = (uint) stack;
+        */
 
         // context, chan, killed is part of stack
 
         newproc->threadid = nextthreadid++;
 
         // TODO:  threadstack?  (commented above, kstack)
+
+        // NEW:  based on allocproc()
+        kfree(newproc->kstack);
+
+        newproc->kstack = stack;
+
+        char *sp;
+        sp = newproc->kstack + KSTACKSIZE;
+
+        // Leave room for trap frame.
+        sp -= sizeof *newproc->tf;
+        newproc->tf = (struct trapframe *)sp;
+
+        // Set up new context to start executing at (forkret),
+        // Set up new context to start executing at fcn,
+        // which returns to trapret.
+        sp -= 4;
+        *(uint *) sp = (uint) trapret;
+        //*(uint *) sp = (uint) stack;
+
+        sp -= sizeof *newproc->context;
+        newproc->context = (struct context *)sp;
+        memset(newproc->context, 0, sizeof *newproc->context);
+        //newproc->context->eip = (uint) forkret;
+        newproc->context->eip = (uint) fcn;
+
 
         acquire(&ptable.lock);
 
@@ -641,32 +670,35 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
 int sys_clone(void)
 {
         int rc = 0;
-        void *arg = (void *)0;
-        void *stack = (void *)0;
-        void (*fcn)(void*) = (void *)0;
+        void *arg = NULL;
+        void *stack = NULL;
+        void (*fcn)(void*) = NULL;
 
-        //if (0 > (rc = argptr(0, (void *)&fcn, sizeof(fcn)))) {
-        if (0 > (rc = argptr(0, (char **)fcn, sizeof(fcn)))) {
+        if (0 > (rc = argptr(0, (char **)&fcn, sizeof(fcn)))) {
                 return rc;
         }
 
-        //if (0 > (rc = argptr(1, (void *)&arg, sizeof(arg)))) {
-        if (0 > (rc = argptr(1, arg, sizeof(arg)))) {
+        if (0 > (rc = argptr(1, (char **)&arg, sizeof(arg)))) {
                 return rc;
         }
 
-        //if (0 > (rc = argptr(2, (void *)&stack, sizeof(stack)))) {
-        if (0 > (rc = argptr(2, stack, sizeof(stack)))) {
+        if (0 > (rc = argptr(2, (char **)&stack, sizeof(stack)))) {
                 return rc;
         }
 
         return clone(fcn, arg, stack);
+        //return clone(V2P_WO(fcn), V2P_WO(arg), V2P_WO(stack));
 }
 
 // TODO:  Change from wait() to join()
 // Based on wait()
 int join(int pid)
 {
+        // PID can't be negative, 0 (kernel?/initialized?), or 1 (init)
+        if (2 > pid) {
+                return RC_ERR;
+        }
+
         struct proc *p;
 
         //int havekids, pid;
