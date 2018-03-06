@@ -14,9 +14,7 @@
 #ifndef kthreads_h
 #define kthreads_h
 
-// TODO:  simple spinlock
 typedef uint lock_t;
-// TODO:  kernel thread type
 typedef struct kthread {
         uint pid;
         uint parent_pid;
