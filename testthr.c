@@ -1,6 +1,18 @@
-#include "types.h"  // uint
-//#include "stat.h"
-#include "user.h"  // strcpy, syscalls
+/**
+* @file testthr.c
+* @author Jas Eckard <eckard@clemson.edu>
+*
+* @section LICENSE
+*
+* GPLv3
+*
+* @section DESCRIPTION
+*
+* This file has rudimentary tests for validity of kthreas functions
+*/
+
+#include "types.h"     // uint
+#include "user.h"      // strcpy, syscalls
 #include "defines.h"   // NULL, TRUE, FALSE, SUCCESS, RC_ERR, STDOUT
 #include "kthreads.h"  // lock_t, kthread
 
@@ -51,21 +63,12 @@ int testgloballock(char *err)
 int testnullthread(char *err)
 {
         int rc = SUCCESS;
-
-        //if (-1 != (rc = thread_create(NULL, NULL))) {
-        //struct kthread thr = thread_create(NULL, NULL);
-        /*
-        if (-1 != (thread_create(NULL, NULL))) {
-                strcpy(err, "err:  thread_create() accepts NULL for start_routine.  \n", rc);
-                return -7;
-        }
-        */
-
         struct kthread emptythr = {0};
+
         if (-1 != (rc = thread_join(emptythr))) {
                 strcpy(err, "err:  thread_join() accepts NULL for "
                             "struct  kthread.\n");
-                return -8;
+                return -7;
         }
 
         return SUCCESS;
@@ -80,7 +83,7 @@ int testthread_create(char *err)
             && (-1 != thr.thread_num)) {
                 strcpy(err, "Empty thread_create() returned a real "
                             "thread, weird\n");
-                return -9;
+                return -8;
         }
 
         return SUCCESS;
