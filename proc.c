@@ -223,7 +223,6 @@ int fork(void)
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.
-// TODO:  Work the same with threads
 void exit(void)
 {
         struct proc *curproc = myproc();
@@ -534,17 +533,6 @@ static inline void cp_code_and_data(struct proc *oldproc,
                                     struct proc *newproc)
 {
         newproc->sz = oldproc->sz;
-
-        // Copy process state from proc.
-        /*
-           if ((newproc->pgdir = copyuvm(oldproc->pgdir, oldproc->sz)) == 0) {
-           kfree(newproc->kstack);
-           newproc->kstack = 0;
-           newproc->state = UNUSED;
-           return -1;
-           }
-         */
-
         newproc->pgdir = oldproc->pgdir;
         *newproc->tf = *oldproc->tf;
 
@@ -557,15 +545,12 @@ static inline void cp_code_and_data(struct proc *oldproc,
         newproc->cwd = idup(oldproc->cwd);
 
         safestrcpy(newproc->name, oldproc->name, sizeof(oldproc->name));
-
 }
 
 // Most of clone() was based on fork()
 int clone(void (*fcn)(void *), void *arg, void *stack)
 {
         int pid;
-
-        //uint thr_stack[] = {0xffffffff, (uint)arg};
         struct proc *newproc;
         struct proc *curproc = myproc();
 
@@ -584,49 +569,26 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
         // different stack:
         cp_code_and_data(curproc, newproc);
 
-        //newproc->threadstack = (uint)stack;
-        //newproc->threadstack = (char *)stack;
-        //newproc->kstack = (char *)stack;
-        //newproc->kstack = stack;
-        //newproc->threadstack = stack;
-
         // state done at the end, locked
 
-        // TODO:  error if multiple procs (threads) w/ same pid?
-        // Use pid from parent thread
         pid = newproc->pid;
 
         newproc->parent = curproc;
 
-        /*
         // trapframe same, except for a few things
         newproc->tf->ebp = newproc->tf->esp;
+
         // Clear %eax so that clone (fork) returns 0 in the child.
         newproc->tf->eax = 0;
         newproc->tf->eip = (uint) fcn;
-           */
-        /*
-           //newproc->tf->esp = (uint)stack+PGSIZE;
-           // TODO:  (2)*4 is some "magic number"
-           //newproc->tf->esp = stack + PGSIZE - (2)*4;
-           newproc->tf->esp = (uint)stack + PGSIZE - 2 * sizeof(void *);
-
-           //thr_stack[0] = 0xffffffff;
-           //thr_stack[1] = (uint)arg;
-           // TODO:  (2)*4 is some "magic number"
-           copyout(newproc->pgdir, newproc->tf->esp, thr_stack, 2 * sizeof(void *));
-         */
-           /*
-        newproc->tf->esp = (uint) stack;
-        */
 
         // context, chan, killed is part of stack
 
         newproc->threadid = nextthreadid++;
 
-        // TODO:  threadstack?  (commented above, kstack)
-
-        // NEW:  based on allocproc()
+        // This section based on allocproc()
+        // TODO:  Push fake return PC (0xffffffff) to the bottom of the
+        //        stack.  Then 'arg'?
         kfree(newproc->kstack);
 
         newproc->kstack = stack;
@@ -638,19 +600,15 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
         sp -= sizeof *newproc->tf;
         newproc->tf = (struct trapframe *)sp;
 
-        // Set up new context to start executing at (forkret),
         // Set up new context to start executing at fcn,
         // which returns to trapret.
         sp -= 4;
         *(uint *) sp = (uint) trapret;
-        //*(uint *) sp = (uint) stack;
 
         sp -= sizeof *newproc->context;
         newproc->context = (struct context *)sp;
         memset(newproc->context, 0, sizeof *newproc->context);
-        //newproc->context->eip = (uint) forkret;
         newproc->context->eip = (uint) fcn;
-
 
         acquire(&ptable.lock);
 
@@ -687,10 +645,8 @@ int sys_clone(void)
         }
 
         return clone(fcn, arg, stack);
-        //return clone(V2P_WO(fcn), V2P_WO(arg), V2P_WO(stack));
 }
 
-// TODO:  Change from wait() to join()
 // Based on wait()
 int join(int pid)
 {
@@ -701,7 +657,6 @@ int join(int pid)
 
         struct proc *p;
 
-        //int havekids, pid;
         int exists = FALSE;
         struct proc *curproc = myproc();
 
@@ -709,48 +664,19 @@ int join(int pid)
 
         do {
                 // Scan through table looking for child thread.
-                //havekids = 0;
                 exists = FALSE;
 
                 for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-                        //if (p->parent != curproc)
                         if (p->pid == pid) {
                                 if (p->parent != curproc) {
                                         release(&ptable.lock);
                                         return RC_ERR;
                                 }
-                                //continue;
                                 // found it!
                                 exists = TRUE;
                                 break;
                         }
-
-                        /*
-                           //havekids = 1;
-                           if (p->state == ZOMBIE) {
-                           // Found one.
-                           pid = p->pid;
-                           kfree(p->kstack);
-                           p->kstack = 0;
-                           freevm(p->pgdir);
-                           p->pid = 0;
-                           p->parent = 0;
-                           p->name[0] = 0;
-                           p->killed = 0;
-                           p->state = UNUSED;
-                           release(&ptable.lock);
-                           return pid;
-                           }
-                         */
                 }
-
-                /*
-                   // No point waiting if we don't have any children.
-                   if (!havekids || curproc->killed) {
-                   release(&ptable.lock);
-                   return -1;
-                   }
-                 */
 
                 // Wait for child thread to exit.  (See wakeup1 call in proc_exit.)
                 if (exists) {
