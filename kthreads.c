@@ -88,9 +88,11 @@ struct kthread thread_create(void (*start_routine)(void *), void *arg)
 {
         struct kthread new_thread = {-1, -1, -1};
 
+        /*  Invalid:  functions starte at 0x0 (NULL)
         if (NULL == start_routine) {
                 return new_thread;
         }
+        */
 
         // create new user stack
         void *stack = malloc(PGSIZE);
