@@ -74,6 +74,7 @@ int testnullthread(char *err)
         return SUCCESS;
 }
 
+/*  Turns out, not a valid test:  functions start at 0x0 (NULL)
 int testthread_create(char *err)
 {
         kthread_t thr = thread_create(NULL, NULL);
@@ -88,6 +89,7 @@ int testthread_create(char *err)
 
         return SUCCESS;
 }
+*/
 
 int main(void)
 {
@@ -109,10 +111,12 @@ int main(void)
                 return rc;
         }
 
+        /*
         if ((rc = testthread_create(err))) {
                 out("testthread_create() failed, rc=%d:\n\t%s", rc, err);
                 return rc;
         }
+        */
 
         out("All tests passed!\n");
 
