@@ -234,7 +234,7 @@ void exit(void)
 
         // Close all open files.
         // unless it is a thread
-        if (0 != curproc->threadid) {
+        if (0 == curproc->threadid) {
                 for (fd = 0; fd < NOFILE; fd++) {
                         if (curproc->ofile[fd]) {
                                 fileclose(curproc->ofile[fd]);
@@ -611,9 +611,7 @@ int clone(void (*fcn)(void *), void *arg, void *stack)
         newproc->context->eip = (uint) fcn;
 
         acquire(&ptable.lock);
-
         newproc->state = RUNNABLE;
-
         release(&ptable.lock);
 
         return pid;
