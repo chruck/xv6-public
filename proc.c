@@ -311,6 +311,31 @@ int wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
+/*  TODO:
+Part A:  xv6 priority-based scheduler
+        1 = low priority
+        2 = high priority
+        - scheduler runs high priority
+        - 2 procs w/ high:  round-robin
+        - `int setpri(int num)`
+                - sets priority for calling proc
+                - default priority for each process = 1 (low)
+                - can raise or lower
+                - return -1 if `num` != 1 or 2
+                - return 0 on success
+        - `int getpinfo(struct pstat*)`
+                - basic info of each running proc
+                        - incl how long run at each priority (in clock ticks)
+                        - PID
+                        - used for modified `ps(1)`
+        - modify `ps(1)` to utilize `getpinfo()`
+        - processes' priority = 1 at creation
+        - process can only be priority = 2 after `setpri()` called
+        - `Makefile`:  change `CPUS := 2` &rarr; `CPUS := 1`
+        - Majority of scheduler code in `proc.[ch]`
+        - `pstat` structure from supplied `pstat.h` to be used in
+          kernel and passed to userspace
+*/
 void scheduler(void)
 {
         struct proc *p;
