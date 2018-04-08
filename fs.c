@@ -28,6 +28,105 @@ static void itrunc(struct inode *);
 // only one device
 struct superblock sb;
 
+/* TODO:
+
+Part B2:  filesystem integrity (xv6)
+        - Change existing xv6 fs:
+                - add protection from data corruption
+        1) modify code to allow user to create new type of file that
+           keeps checksum for each block it points to
+        2) change fs `read()` and `write()` handled differently for
+           files w/ checksums
+                - `write()`:  checksum every block of file
+                - `read()`:  check & make sure block still matches
+                stored checksum
+                        - rc = -1 if not
+        3) modify `stat()` syscall to dump info about file:
+                - write prog
+                        - given filename
+                        - prints out filesize, etc
+                        - also info about checksums
+        1.  understand how fs laid out on disk
+                - use `fs.h`:
+                        - superblock
+                        - log
+                        - inodes
+                        - single block in-use bitmap
+                        - data blocks
+        2.  understand what each inode looks like
+                - use `fs.h`
+                        - filetype (reg file/dir)
+                        - maj/min dev type (know which disk to read)
+                        - reference counter (num dirs file is linked in)
+                        - size (bytes)
+                        - block addresses * (NDIRECT + 1)
+                                - first NDIRECT addrs are direct ptrs
+                                  to first NDIRECT blocks of file (if
+                                  file is that big)
+                                - last block (larger files):  indirect block
+                                        - may contain more ptrs to blocks
+                                          for larger files
+                - keep inode struct as-is, but use slots for direct ptrs
+                  as `(checksum, pointer)` pairs
+                        - use each direct ptr slot (4 bytes) as a
+                          1-byte checksum, 3-byte ptr) (limits disk
+                          addresses fs can refer to 2^24)
+                        - 1-byte checksum is `XOR`
+                                - compute:
+                                        - XOR all bytes of block
+                                        - store in ptr to block
+                                        - every time block written
+                                - `read()`:
+                                        - read in the block
+                                        - compute checksum
+                                        - compare to stored checksum
+                                        - match:  return as usual
+                                        - not:  rc = -1, don't return
+                                          corrupt data
+                                        - does not make replicas of
+                                          blocks (doesn't need to
+                                          recover)
+                        - note: large files need to have direct ptrs of
+                          indirect ptr (which need checksums)
+                - 2 types of files:
+                        1.  existing ptr-based
+                        2.  new checksum-based
+                                - add new file type:
+                                - `stat.h`: `T_DIR`, `T_FILE`, add
+                                  `T_CHECKED` (set to 4)
+                                - check if files are type `T_CHECKED`,
+                                  checks checksum
+                                - create:
+                                        - modify interface to file
+                                          creation
+                                        - add `O_CHECKED` flag (0x400)
+                                          to `open()` syscall
+                                        - when flag is present, fs
+                                          should create checksum-based
+                                          file
+                                        - routines deeper in fs have
+                                          to be modified to be passed
+                                          new flag, use accordingly
+        - no need to do for directories
+        - follow pathts of `read()` and `write()` syscalls
+        - also look at `bmap()`
+        - modify `stat()` syscall to return infor about actual disk
+          addrs in inode
+                - `stat()` doesn't return such info
+                - use `newstatstruct.h`
+                        - has room to return exactly 1 byte of
+                          checksum info about file
+                        - XOR all of existing checksums over blocks of
+                          file
+                        - return in `checksum` field of stat struct
+        - create new prog `filestat`
+                - called:  `filestat pathname`
+                        - prints out all info about file:
+                                - type
+                                - size
+                                - new checksum
+*/
+
 // Read the super block.
 void readsb(int dev, struct superblock *sb)
 {
