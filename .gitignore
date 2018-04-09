@@ -15,3 +15,4 @@ kernelmemfs
 mkfs
 .gdbinit
 TAGS
+linux/fscheck
