@@ -1,6 +1,6 @@
 CFLAGS := -Og -Wall -ggdb -Werror
 
-fscheck: fscheck.o
+fscheck: fscheck.o printerror.o checkinode.o checkdir.o checkblk.o
 
 clean:
 	rm -f TAGS *.o fscheck
