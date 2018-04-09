@@ -195,6 +195,15 @@ Makefile:
 defines.h:
 - Created for most common `#defines`.
 
+linux/Makefile:
+- Created to make fscheck
+
+linux/fscheck.c:
+- Code for fscheck program
+
+linux/check*.[ch], linux/*error.[ch]:
+- Code to support fscheck program
+
 proc.c:
 - Added `clone()`, `join()`, and corresponding syscall functions.
 
