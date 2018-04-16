@@ -8,14 +8,14 @@
 *
 * @section DESCRIPTION
 *
-* This file is ...
+* This file is the header file to checkinodes
 */
 
 #ifndef checkinode_h
 #define checkinode_h
 
 #include <stdio.h>      // FILE
-#include "error.h"      // rc_err, fs_err, printerror()
+#include "error.h"      // fs_err
 
 fs_err checkinodes(FILE *xv6_fs_img);
 
