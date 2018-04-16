@@ -87,11 +87,15 @@ Part B1: filesystem checker, Linux
 #include "checkdir.h"    // checkdirectories()
 #include "checkblk.h"    // checkblocks()
 #include "error.h"       // rc_err, fs_err, printerror()
+#include "debug.h"       // debug(), checkifdebugging()
+
+// Global vars
+bool isdebugging = false;
 
 rc_err checkparams(const int argc, const char *argv[], FILE **fp)
 {
         if (2 != argc) {
-                fprintf(stderr, "expecting file system image filename\n\n");
+                fprintf(stderr, "expecting 1 file system image filename\n\n");
                 return NO_IMG_GIVEN;
         }
 
@@ -99,6 +103,9 @@ rc_err checkparams(const int argc, const char *argv[], FILE **fp)
                 fprintf(stderr, "image not found\n\n");
                 return IMG_NOT_FOUND;
         }
+
+        checkifdebugging();
+        debug("Checking filesystem file '%s'.\n", argv[1]);
 
         return SUCCESS;
 }
