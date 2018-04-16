@@ -35,6 +35,8 @@ typedef enum {
         FS_INODE_IN_DIR_MARKED_FREE,
         FS_FILE_BAD_REF_COUNT,
         FS_DIR_MULTI_IN_FS,
+        FS_BAD_FS_FILE_SEEK,
+        FS_BAD_FS_FILE_READ,
 } fs_err;
 
 int printerror(const fs_err errno);
