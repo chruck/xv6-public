@@ -38,11 +38,13 @@ int printerror(const fs_err errno)
                         break;
 
                 case FS_INODE_ADDR_USED_MARKED_FREE:
-                        printf("address used by inode but marked free in bitmap\n");
+                        printf("address used by inode but marked free "
+                               "in bitmap\n");
                         break;
 
                 case FS_BLOCK_USED_NOT_USED:
-                        printf("bitmap marks block in use but it is not in use\n");
+                        printf("bitmap marks block in use but it is "
+                               "not in use\n");
                         break;
 
                 case FS_ADDR_USED_MULT:
@@ -50,11 +52,13 @@ int printerror(const fs_err errno)
                         break;
 
                 case FS_INODE_USED_NOT_IN_DIR:
-                        printf("inode marked in use but not found in a directory\n");
+                        printf("inode marked in use but not found in "
+                               "a directory\n");
                         break;
 
                 case FS_INODE_IN_DIR_MARKED_FREE:
-                        printf("inode referred to in directory but marked free\n");
+                        printf("inode referred to in directory but "
+                               "marked free\n");
                         break;
 
                 case FS_FILE_BAD_REF_COUNT:
@@ -62,7 +66,18 @@ int printerror(const fs_err errno)
                         break;
 
                 case FS_DIR_MULTI_IN_FS:
-                        printf("directory appears more than once in file system\n");
+                        printf("directory appears more than once in "
+                               "file system\n");
+                        break;
+
+                case FS_BAD_FS_FILE_SEEK:
+                        printf("error trying to fseek(3) the file "
+                               "system file\n");
+                        break;
+
+                case FS_BAD_FS_FILE_READ:
+                        printf("error trying to fread(3) the file "
+                               "system file\n");
                         break;
 
                 case FS_SUCCESS:
