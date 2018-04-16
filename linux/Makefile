@@ -10,4 +10,4 @@ clean:
 	rm -f TAGS *.d *.o fscheck
 
 tags:
-	etags *.c *.h
+	etags *.c *.h ../*.c ../*.h
