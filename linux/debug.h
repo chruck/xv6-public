@@ -42,10 +42,11 @@ static inline void checkifdebugging(void)
         }
 }
 
-#define debug(...)  do { \
-                        if (isdebugging) { \
-                                fprintf(stderr, "DEBUG:  " __VA_ARGS__); \
-                        } \
-                    } while (false);
+#define debug(str, args...) \
+        do { \
+                if (isdebugging) { \
+                        fprintf(stderr, "DEBUG:  " str "\n", ##args); \
+                } \
+        } while (false);
 
 #endif  // debug_h
