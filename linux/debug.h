@@ -19,16 +19,23 @@
 
 extern bool isdebugging;
 
-void checkifdebugging(void)
+static inline void checkifdebugging(void)
 {
         char *debug_env = getenv("DEBUG");
 
+        // No 'DEBUG' env var:  don't debug
+        if (NULL == debug_env) {
+                isdebugging = false;
+                return;
+        }
+
         switch (debug_env[0]) {
-                case '1':  // 1
-                case 't':  // true
-                case 'y':  // yes
+                case '1':  // "1"
+                case 't':  // "true"
+                case 'y':  // "yes"
                         isdebugging = true;
                         break;
+                case 0:    // exists, but is empty
                 default:
                         isdebugging = false;
                         break;
@@ -37,7 +44,7 @@ void checkifdebugging(void)
 
 #define debug(...)  do { \
                         if (isdebugging) { \
-                                fprintf(stderr, __VA_ARGS__); \
+                                fprintf(stderr, "DEBUG:  " __VA_ARGS__); \
                         } \
                     } while (false);
 
