@@ -1,6 +1,6 @@
 CFLAGS := -Og -Wall -ggdb -Werror -MD
 
-OBJS := fscheck.o printerror.o checkinode.o checkdir.o checkblk.o
+OBJS := fscheck.o printerror.o checkinode.o checkdir.o checkblk.o readsuperblock.o
 
 fscheck: ${OBJS} debug.h error.h
 
