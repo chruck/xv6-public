@@ -107,7 +107,7 @@ rc_err checkparams(const int argc, const char *argv[], FILE **fp)
                 return IMG_NOT_FOUND;
         }
 
-        debug("Checking filesystem file '%s'.\n", argv[1]);
+        debug("Checking filesystem file '%s'.", argv[1]);
 
         return SUCCESS;
 }
