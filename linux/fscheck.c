@@ -82,18 +82,21 @@ Part B1: filesystem checker, Linux
 
 */
 
-#include <stdio.h>       // printf(), fprintf()
-#include "checkinode.h"  // checkinodes()
-#include "checkdir.h"    // checkdirectories()
-#include "checkblk.h"    // checkblocks()
-#include "error.h"       // rc_err, fs_err, printerror()
-#include "debug.h"       // debug(), checkifdebugging()
+#include <stdio.h>           // printf(), fprintf()
+#include "checkinode.h"      // checkinodes()
+#include "checkdir.h"        // checkdirectories()
+#include "checkblk.h"        // checkblocks()
+#include "error.h"           // rc_err, fs_err, printerror()
+#include "debug.h"           // debug(), checkifdebugging()
+#include "readsuperblock.h"  // readsuperblock()
 
 // Global vars
 bool isdebugging = false;
 
 rc_err checkparams(const int argc, const char *argv[], FILE **fp)
 {
+        checkifdebugging();
+
         if (2 != argc) {
                 fprintf(stderr, "expecting 1 file system image filename\n\n");
                 return NO_IMG_GIVEN;
@@ -104,7 +107,6 @@ rc_err checkparams(const int argc, const char *argv[], FILE **fp)
                 return IMG_NOT_FOUND;
         }
 
-        checkifdebugging();
         debug("Checking filesystem file '%s'.\n", argv[1]);
 
         return SUCCESS;
@@ -133,7 +135,11 @@ int main(const int argc, const char *argv[])
         }
         */
 
-        err = checkinodes(fs_img);
+        err = readsuperblock(fs_img);
+
+        if (FS_SUCCESS == err) {
+                err = checkinodes(fs_img);
+        }
 
         if (FS_SUCCESS == err) {
                 err = checkdirectories(fs_img);
