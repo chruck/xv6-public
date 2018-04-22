@@ -17,8 +17,8 @@
 #include <stdio.h>           // FILE
 #include "../types.h"        // uint
 #include "../fs.h"           // BSIZE, superblock
-#include "error.h"           // fs_err
+#include "error.h"           // err
 
-rc_err readsuperblock(FILE *xv6_fs_img, struct superblock *sb);
+err readsuperblock(FILE *xv6_fs_img, struct superblock *sb);
 
 #endif  // readsuperblock_h

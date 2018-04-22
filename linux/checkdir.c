@@ -8,14 +8,14 @@
 *
 * @section DESCRIPTION
 *
-* This file is ...
+* This file is checks the directories
 */
 
 #include <stdio.h>      // FILE
-#include "error.h"     // rc_err, fs_err, printerror()
+#include "error.h"      // err, printerror()
 #include "checkdir.h"
 
-fs_err checkdirectories(FILE *xv6_fs_img)
+err checkdirectories(FILE *xv6_fs_img)
 {
-        return FS_SUCCESS;
+        return SUCCESS;
 }

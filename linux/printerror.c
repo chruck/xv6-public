@@ -1,20 +1,20 @@
 /**
 * @file printerror.c
-* @author Jas Eckard <eckard@clemson.edu
+* @author Jas Eckard <eckard@clemson.edu>
 *
 * @section LICENSE
 *
-* (GPL license?)
+* GPL v3
 *
 * @section DESCRIPTION
 *
 * This file is used by fschecker to print out the error messages.
 */
 
-#include <stdio.h>
-#include "error.h"
+#include <stdio.h>      // printf(3)
+#include "error.h"      // err
 
-int printerror(const fs_err errno)
+int printerror(const err errno)
 {
         switch (errno) {
                 case FS_BAD_INODE:
@@ -70,19 +70,17 @@ int printerror(const fs_err errno)
                                "file system\n");
                         break;
 
-                        /*
-                case FS_BAD_FS_FILE_SEEK:
+                case BAD_FS_FILE_SEEK:
                         printf("error trying to fseek(3) the file "
                                "system file\n");
                         break;
 
-                case FS_BAD_FS_FILE_READ:
+                case BAD_FS_FILE_READ:
                         printf("error trying to fread(3) the file "
                                "system file\n");
                         break;
-                        */
 
-                case FS_SUCCESS:
+                case SUCCESS:
                 default:
                         break;
         }

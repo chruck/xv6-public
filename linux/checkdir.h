@@ -8,15 +8,15 @@
 *
 * @section DESCRIPTION
 *
-* This file is ...
+* Header file to check directories.
 */
 
 #ifndef checkdir_h
 #define checkdir_h
 
 #include <stdio.h>      // FILE
-#include "error.h"     // rc_err, fs_err, printerror()
+#include "error.h"      // err, printerror()
 
-fs_err checkdirectories(FILE *xv6_fs_img);
+err checkdirectories(FILE *xv6_fs_img);
 
 #endif  // checkdir_h

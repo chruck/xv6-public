@@ -15,8 +15,8 @@
 #define checkinode_h
 
 #include <stdio.h>      // FILE
-#include "error.h"      // fs_err
+#include "error.h"      // err
 
-fs_err checkinodes(FILE *xv6_fs_img);
+err checkinodes(FILE *xv6_fs_img);
 
 #endif  // checkinode_h

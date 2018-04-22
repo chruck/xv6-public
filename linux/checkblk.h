@@ -8,15 +8,15 @@
 *
 * @section DESCRIPTION
 *
-* This file is ...
+* Header file to check blocks
 */
 
 #ifndef checkblk_h
 #define checkblk_h
 
 #include <stdio.h>      // FILE
-#include "error.h"     // rc_err, fs_err, printerror()
+#include "error.h"      // err, printerror()
 
-fs_err checkblocks(FILE *xv6_fs_img);
+err checkblocks(FILE *xv6_fs_img);
 
 #endif  // checkblk_h

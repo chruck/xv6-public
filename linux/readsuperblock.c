@@ -16,10 +16,10 @@
 #include "../types.h"        // uint
 #include "../fs.h"           // BSIZE, superblock
 #include "debug.h"           // debug(), checkifdebugging()
-#include "error.h"           // rc_err, fs_err, printerror()
+#include "error.h"           // err, printerror()
 #include "readsuperblock.h"  // readsuperblock()
 
-rc_err readsuperblock(FILE *xv6_fs_img, struct superblock *sb)
+err readsuperblock(FILE *xv6_fs_img, struct superblock *sb)
 {
         const long offset = 1 * BSIZE;
         uchar buf[BSIZE] = "";

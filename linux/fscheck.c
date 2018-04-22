@@ -88,14 +88,14 @@ Part B1: filesystem checker, Linux
 #include "checkinode.h"      // checkinodes()
 #include "checkdir.h"        // checkdirectories()
 #include "checkblk.h"        // checkblocks()
-#include "error.h"           // rc_err, fs_err, printerror()
+#include "error.h"           // err, printerror()
 #include "debug.h"           // debug(), checkifdebugging()
 #include "readsuperblock.h"  // readsuperblock()
 
 // Global vars
 bool isdebugging = false;
 
-rc_err checkparams(const int argc, const char *argv[], FILE **fp)
+err checkparams(const int argc, const char *argv[], FILE **fp)
 {
         checkifdebugging();
 
@@ -114,7 +114,7 @@ rc_err checkparams(const int argc, const char *argv[], FILE **fp)
         return SUCCESS;
 }
 
-rc_err usage(const rc_err rc)
+err usage(const err rc)
 {
         printf("Usage:  fscheck file_system_image\n\n");
 
@@ -123,8 +123,7 @@ rc_err usage(const rc_err rc)
 
 int main(const int argc, const char *argv[])
 {
-        rc_err rc = SUCCESS;
-        fs_err err = FS_SUCCESS;
+        err rc = SUCCESS;
         FILE *fs_img = NULL;
         struct superblock sb = {};
 
@@ -133,26 +132,26 @@ int main(const int argc, const char *argv[])
         }
 
         /*
-        for ( ; FS_DIR_MULTI_IN_FS >= err; ++err) {
-                printerror(err);
+        for ( ; FS_DIR_MULTI_IN_FS >= rc; ++rc) {
+                printerror(rc);
         }
         */
 
-        err = readsuperblock(fs_img, &sb);
+        rc = readsuperblock(fs_img, &sb);
 
-        if (FS_SUCCESS == err) {
-                err = checkinodes(fs_img);
+        if (SUCCESS == rc) {
+                rc = checkinodes(fs_img);
         }
 
-        if (FS_SUCCESS == err) {
-                err = checkdirectories(fs_img);
+        if (SUCCESS == rc) {
+                rc = checkdirectories(fs_img);
         }
 
-        if (FS_SUCCESS == err) {
-                err = checkblocks(fs_img);
+        if (SUCCESS == rc) {
+                rc = checkblocks(fs_img);
         }
 
         fclose(fs_img);
 
-        return printerror(err);
+        return printerror(rc);
 }

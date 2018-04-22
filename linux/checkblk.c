@@ -8,14 +8,14 @@
 *
 * @section DESCRIPTION
 *
-* This file is ...
+* This file checks the blocks
 */
 
 #include <stdio.h>      // FILE
-#include "error.h"     // rc_err, fs_err, printerror()
+#include "error.h"      // err, printerror()
 #include "checkblk.h"
 
-fs_err checkblocks(FILE *xv6_fs_img)
+err checkblocks(FILE *xv6_fs_img)
 {
-        return FS_SUCCESS;
+        return SUCCESS;
 }

@@ -1,10 +1,10 @@
 /**
 * @file error.h
-* @author Jas Eckard <eckard@clemson.edu
+* @author Jas Eckard <eckard@clemson.edu>
 *
 * @section LICENSE
 *
-* (GPL license?)
+* GPL v3
 *
 * @section DESCRIPTION
 *
@@ -18,13 +18,6 @@
 typedef enum {
         SUCCESS = 0,
         IMG_NOT_FOUND = 1,
-        NO_IMG_GIVEN,
-        BAD_FS_FILE_SEEK,
-        BAD_FS_FILE_READ,
-} rc_err;
-
-typedef enum {
-        FS_SUCCESS = 0,
         FS_BAD_INODE,
         FS_BAD_INODE_ADDR,
         FS_ROOT_DIR_DNE,
@@ -37,8 +30,11 @@ typedef enum {
         FS_INODE_IN_DIR_MARKED_FREE,
         FS_FILE_BAD_REF_COUNT,
         FS_DIR_MULTI_IN_FS,
-} fs_err;
+        NO_IMG_GIVEN = -255,
+        BAD_FS_FILE_SEEK,
+        BAD_FS_FILE_READ,
+} err;
 
-int printerror(const fs_err errno);
+int printerror(const err errno);
 
 #endif  // error_h
