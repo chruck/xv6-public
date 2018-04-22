@@ -19,6 +19,7 @@
 #include "../fs.h"           // BSIZE, superblock
 #include "error.h"           // err
 
-err checkinodes(FILE *xv6_fs_img, struct superblock *sb);
+err checkinodes(FILE *xv6_fs_img, struct superblock *sb,
+                struct dinode *inodetbl);
 
 #endif  // checkinode_h

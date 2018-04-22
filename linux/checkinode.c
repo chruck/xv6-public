@@ -13,15 +13,26 @@
 
 #include <string.h>          // memmove(3)
 #include "debug.h"           // debug(), checkifdebugging()
+#include "mkfstools.h"       // rsect()
 #include "checkinode.h"
 
-err checkinodes(FILE *xv6_fs_img, struct superblock *sb)
+err loadinodetable(FILE *xv6_fs_img, struct superblock *sb,
+                   struct dinode *inodetbl)
 {
-        const long offset = sb->inodestart * BSIZE;
+        err rc = SUCCESS;
+        //const long offset = sb->inodestart * BSIZE;
         uchar buf[BSIZE] = "";
 
-        debug("Begin reading inodes");
+        debug("Load inode table");
 
+        inodetbl = malloc(sizeof(struct dinode) * sb->ninodes);
+
+        if (NULL == inodetbl) {
+                debug("unable to malloc %d inode structures", sb->ninodes);
+                return CANT_MALLOC;
+        }
+
+        /*
         if (0 != fseek(xv6_fs_img, offset, SEEK_SET)) {
                 debug("error reading inodes");
                 return BAD_FS_FILE_SEEK;
@@ -31,15 +42,31 @@ err checkinodes(FILE *xv6_fs_img, struct superblock *sb)
                 debug("error reading inodes:  short");
                 return BAD_FS_FILE_READ;
         }
+        */
+        rc = rsect(xv6_fs_img, sb->inodestart, buf);
 
-        memmove(sb, buf, sizeof(struct superblock));
+        if (SUCCESS != rc) {
+                debug("Error reading inode start");
+                return rc;
+        }
 
-        debug("Superblock:\n\tsize=%d\n\tnblocks=%d\n\tninodes=%d\n"
-              "\tnlog=%d\n\tlogstart=%d\n\tinodestart=%d\n\tbmapstart=%d",
-              sb->size, sb->nblocks, sb->ninodes, sb->nlog, sb->logstart,
-              sb->inodestart, sb->bmapstart);
+        //memmove(inodetbl, buf, sizeof(struct dinode));
+
+        debug("Finish loading inode table");
+
+        return rc;
+}
+
+err checkinodes(FILE *xv6_fs_img, struct superblock *sb,
+                struct dinode *inodetbl)
+{
+        err rc = SUCCESS;
+
+        debug("Begin reading inodes");
+
+        rc = loadinodetable(xv6_fs_img, sb, inodetbl);
 
         debug("End reading inodes");
 
-        return SUCCESS;
+        return rc;
 }
