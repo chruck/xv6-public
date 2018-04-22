@@ -80,6 +80,15 @@ int printerror(const err errno)
                                "system file\n");
                         break;
 
+                case BAD_FS_FILE_WRITE:
+                        printf("error trying to fwrite(3) the file "
+                               "system file\n");
+                        break;
+
+                case CANT_MALLOC:
+                        printf("error trying to malloc(3)\n");
+                        break;
+
                 case SUCCESS:
                 default:
                         break;
