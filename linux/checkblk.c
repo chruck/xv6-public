@@ -11,9 +11,16 @@
 * This file checks the blocks
 */
 
+#include "debug.h"           // debug(), checkifdebugging()
 #include "checkblk.h"
 
 err checkblocks(FILE *xv6_fs_img)
 {
-        return SUCCESS;
+        err rc = SUCCESS;
+
+        debug("Begin reading blocks");
+
+        debug("End reading blocks");
+
+        return rc;
 }

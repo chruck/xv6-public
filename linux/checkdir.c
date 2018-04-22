@@ -11,9 +11,16 @@
 * This file is checks the directories
 */
 
+#include "debug.h"           // debug(), checkifdebugging()
 #include "checkdir.h"
 
 err checkdirectories(FILE *xv6_fs_img)
 {
-        return SUCCESS;
+        err rc = SUCCESS;
+
+        debug("Begin reading directories");
+
+        debug("End reading directories");
+
+        return rc;
 }
