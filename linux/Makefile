@@ -1,6 +1,13 @@
-CFLAGS := -Og -Wall -ggdb -Werror -MD
+CFLAGS := -O0 -Og -Wall -g3 -ggdb -Werror -MD
 
-OBJS := fscheck.o printerror.o checkinode.o checkdir.o checkblk.o readsuperblock.o
+OBJS := \
+	checkblk.o \
+	checkdir.o \
+	checkinode.o \
+	fscheck.o \
+	mkfstools.o \
+	printerror.o \
+	readsuperblock.o \
 
 fscheck: ${OBJS} debug.h error.h
 
