@@ -14,9 +14,11 @@
 #ifndef readsuperblock_h
 #define readsuperblock_h
 
-#include <stdio.h>      // FILE
-#include "error.h"      // fs_err
+#include <stdio.h>           // FILE
+#include "../types.h"        // uint
+#include "../fs.h"           // BSIZE, superblock
+#include "error.h"           // fs_err
 
-fs_err readsuperblock(FILE *xv6_fs_img);
+rc_err readsuperblock(FILE *xv6_fs_img, struct superblock *sb);
 
 #endif  // readsuperblock_h

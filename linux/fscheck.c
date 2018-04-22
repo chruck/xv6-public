@@ -83,6 +83,8 @@ Part B1: filesystem checker, Linux
 */
 
 #include <stdio.h>           // printf(), fprintf()
+#include "../types.h"        // uint
+#include "../fs.h"           // BSIZE, superblock
 #include "checkinode.h"      // checkinodes()
 #include "checkdir.h"        // checkdirectories()
 #include "checkblk.h"        // checkblocks()
@@ -124,6 +126,7 @@ int main(const int argc, const char *argv[])
         rc_err rc = SUCCESS;
         fs_err err = FS_SUCCESS;
         FILE *fs_img = NULL;
+        struct superblock sb = {};
 
         if (SUCCESS != (rc = checkparams(argc, argv, &fs_img))) {
                 return usage(rc);
@@ -135,7 +138,7 @@ int main(const int argc, const char *argv[])
         }
         */
 
-        err = readsuperblock(fs_img);
+        err = readsuperblock(fs_img, &sb);
 
         if (FS_SUCCESS == err) {
                 err = checkinodes(fs_img);
