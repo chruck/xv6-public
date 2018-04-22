@@ -123,6 +123,7 @@ int main(const int argc, const char * const argv[])
         err rc = SUCCESS;
         FILE *fs_img = NULL;
         struct superblock sb = {};
+        struct dinode *inodetbl = NULL;
 
         if (SUCCESS != (rc = checkparams(argc, argv, &fs_img))) {
                 return usage(rc);
@@ -137,7 +138,9 @@ int main(const int argc, const char * const argv[])
         rc = readsuperblock(fs_img, &sb);
 
         if (SUCCESS == rc) {
-                rc = checkinodes(fs_img, &sb);
+                rc = checkinodes(fs_img, &sb, inodetbl);
+
+                free(inodetbl);
         }
 
         if (SUCCESS == rc) {
@@ -148,7 +151,17 @@ int main(const int argc, const char * const argv[])
                 rc = checkblocks(fs_img);
         }
 
-        fclose(fs_img);
+        /*
+        if (SUCCESS == rc) {
+                rc = free(inodetbl);
+        }
+        */
+
+        //free(inodetbl);
+
+        if (SUCCESS == rc) {
+                rc = fclose(fs_img);
+        }
 
         return printerror(rc);
 }
