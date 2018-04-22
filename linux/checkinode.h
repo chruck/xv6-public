@@ -14,9 +14,11 @@
 #ifndef checkinode_h
 #define checkinode_h
 
-#include <stdio.h>      // FILE
-#include "error.h"      // err
+#include <stdio.h>           // FILE
+#include "../types.h"        // uint
+#include "../fs.h"           // BSIZE, superblock
+#include "error.h"           // err
 
-err checkinodes(FILE *xv6_fs_img);
+err checkinodes(FILE *xv6_fs_img, struct superblock *sb);
 
 #endif  // checkinode_h
