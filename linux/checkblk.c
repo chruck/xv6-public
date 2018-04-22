@@ -11,8 +11,6 @@
 * This file checks the blocks
 */
 
-#include <stdio.h>      // FILE
-#include "error.h"      // err, printerror()
 #include "checkblk.h"
 
 err checkblocks(FILE *xv6_fs_img)
