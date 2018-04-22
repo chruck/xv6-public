@@ -11,12 +11,8 @@
 * This file reads the filesystem file for the superblock
 */
 
-#include <stdio.h>           // FILE, fseek(3)
 #include <string.h>          // memmove(3)
-#include "../types.h"        // uint
-#include "../fs.h"           // BSIZE, superblock
 #include "debug.h"           // debug(), checkifdebugging()
-#include "error.h"           // err, printerror()
 #include "readsuperblock.h"  // readsuperblock()
 
 err readsuperblock(FILE *xv6_fs_img, struct superblock *sb)
