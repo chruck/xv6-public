@@ -82,20 +82,17 @@ Part B1: filesystem checker, Linux
 
 */
 
-#include <stdio.h>           // printf(), fprintf()
-#include "../types.h"        // uint
-#include "../fs.h"           // BSIZE, superblock
-#include "checkinode.h"      // checkinodes()
-#include "checkdir.h"        // checkdirectories()
 #include "checkblk.h"        // checkblocks()
-#include "error.h"           // err, printerror()
+#include "checkdir.h"        // checkdirectories()
+#include "checkinode.h"      // checkinodes()
 #include "debug.h"           // debug(), checkifdebugging()
+#include "error.h"           // err, printerror()
 #include "readsuperblock.h"  // readsuperblock()
 
 // Global vars
 bool isdebugging = false;
 
-err checkparams(const int argc, const char *argv[], FILE **fp)
+err checkparams(const int argc, const char * const argv[], FILE **fp)
 {
         checkifdebugging();
 
@@ -121,7 +118,7 @@ err usage(const err rc)
         return rc;
 }
 
-int main(const int argc, const char *argv[])
+int main(const int argc, const char * const argv[])
 {
         err rc = SUCCESS;
         FILE *fs_img = NULL;
@@ -140,7 +137,7 @@ int main(const int argc, const char *argv[])
         rc = readsuperblock(fs_img, &sb);
 
         if (SUCCESS == rc) {
-                rc = checkinodes(fs_img);
+                rc = checkinodes(fs_img, &sb);
         }
 
         if (SUCCESS == rc) {
