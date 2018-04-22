@@ -30,9 +30,11 @@ typedef enum {
         FS_INODE_IN_DIR_MARKED_FREE,
         FS_FILE_BAD_REF_COUNT,
         FS_DIR_MULTI_IN_FS,
-        NO_IMG_GIVEN = -255,
+        NO_IMG_GIVEN,
         BAD_FS_FILE_SEEK,
         BAD_FS_FILE_READ,
+        BAD_FS_FILE_WRITE,
+        CANT_MALLOC,
 } err;
 
 int printerror(const err errno);
