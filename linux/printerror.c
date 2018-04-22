@@ -70,6 +70,7 @@ int printerror(const fs_err errno)
                                "file system\n");
                         break;
 
+                        /*
                 case FS_BAD_FS_FILE_SEEK:
                         printf("error trying to fseek(3) the file "
                                "system file\n");
@@ -79,6 +80,7 @@ int printerror(const fs_err errno)
                         printf("error trying to fread(3) the file "
                                "system file\n");
                         break;
+                        */
 
                 case FS_SUCCESS:
                 default:
