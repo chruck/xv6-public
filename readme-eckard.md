@@ -191,9 +191,13 @@ Makefile:
 - Added `kthreads.o` to `ULIB`.
 - Added `_testkthreads`, `_testthr` to `UPROGS`.
 - Added `testkthreads.c`, `testthr.c` to `EXTRA`.
+- Added `-Og -MD -ggdb" to `mkfs` for debugging
 
 defines.h:
 - Created for most common `#defines`.
+
+fs.h:
+- Added `#include` guards.
 
 linux/Makefile:
 - Created to make fscheck
