@@ -11,8 +11,6 @@
 * This file is checks the directories
 */
 
-#include <stdio.h>      // FILE
-#include "error.h"      // err, printerror()
 #include "checkdir.h"
 
 err checkdirectories(FILE *xv6_fs_img)
