@@ -17,9 +17,10 @@
 #include <stdio.h>           // FILE
 #include "../types.h"        // uint
 #include "../fs.h"           // BSIZE, superblock
+#include "mkfstools.h"       // rsect(), NINODES
 #include "error.h"           // err
 
-err checkinodes(FILE *xv6_fs_img, struct superblock *sb,
-                struct dinode *inodetbl);
+//err checkinodes(FILE *xv6_fs_img, struct superblock *sb, struct dinode *inodetbl[NINODES]);
+err checkinodes(FILE *xv6_fs_img, struct superblock *sb, struct dinode **inodetbl);
 
 #endif  // checkinode_h
