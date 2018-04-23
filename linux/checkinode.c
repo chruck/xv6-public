@@ -12,59 +12,109 @@
 */
 
 #include <string.h>          // memmove(3)
+#include "../types.h"        // uint
+#include "../stat.h"         // T_FILE, T_DIR, T_DEV
+#include "../param.h"        // LOGSIZE
 #include "debug.h"           // debug(), checkifdebugging()
-#include "mkfstools.h"       // rsect()
 #include "checkinode.h"
 
 err loadinodetable(FILE *xv6_fs_img, struct superblock *sb,
-                   struct dinode *inodetbl)
+                   //struct dinode *inodetbl[NINODES])
+                   struct dinode **inodetbl)
 {
         err rc = SUCCESS;
-        //const long offset = sb->inodestart * BSIZE;
-        uchar buf[BSIZE] = "";
+        struct dinode inode = {};
 
         debug("Load inode table");
 
-        inodetbl = malloc(sizeof(struct dinode) * sb->ninodes);
-
-        if (NULL == inodetbl) {
-                debug("unable to malloc %d inode structures", sb->ninodes);
-                return CANT_MALLOC;
-        }
+        //*inodetbl = malloc(sizeof(struct dinode) * NINODES);
 
         /*
-        if (0 != fseek(xv6_fs_img, offset, SEEK_SET)) {
-                debug("error reading inodes");
-                return BAD_FS_FILE_SEEK;
-        }
-
-        if (1 != fread(&buf, BSIZE, 1, xv6_fs_img)) {
-                debug("error reading inodes:  short");
-                return BAD_FS_FILE_READ;
+        if (NULL == *inodetbl) {
+                debug("unable to malloc %d inode structures", NINODES);
+                return CANT_MALLOC;
         }
         */
-        rc = rsect(xv6_fs_img, sb->inodestart, buf);
 
-        if (SUCCESS != rc) {
-                debug("Error reading inode start");
-                return rc;
+        for (int i = 0; NINODES > i; ++i) {
+                bzero(&inode, sizeof(struct dinode));
+                //rc = rinode(xv6_fs_img, i, &inode, sb->inodestart);
+                rc = rinode(xv6_fs_img, i, &inode, LOGSIZE + 2);
+                if (SUCCESS != rc) {
+                        debug("Problem reading inode #%d", i);
+                        return rc;
+                }
+                memmove(*inodetbl + i, &inode, sizeof(struct dinode));
         }
-
-        //memmove(inodetbl, buf, sizeof(struct dinode));
 
         debug("Finish loading inode table");
 
         return rc;
 }
 
+err checktype(struct dinode inode)
+{
+        err rc = SUCCESS;
+
+        switch (inode.type) {
+                case T_FILE:
+                case T_DIR:
+                case T_DEV:
+                        break;
+                default:
+                        rc = FS_BAD_INODE;
+                        break;
+        }
+
+        return rc;
+}
+
+err checkaddr(struct dinode inode)
+{
+        err rc = SUCCESS;
+
+                // rc = FS_BAD_INODE_ADDR;
+
+        return rc;
+}
+
+err checkrootdir(struct dinode inode)
+{
+        err rc = SUCCESS;
+
+                // rc = FS_ROOT_DIR_DNE;
+
+        return rc;
+}
+
 err checkinodes(FILE *xv6_fs_img, struct superblock *sb,
-                struct dinode *inodetbl)
+                //struct dinode *inodetbl[NINODES])
+                struct dinode **inodetbl)
 {
         err rc = SUCCESS;
 
         debug("Begin reading inodes");
 
         rc = loadinodetable(xv6_fs_img, sb, inodetbl);
+
+        if (SUCCESS == rc) {
+                // first inode is 1, not 0
+                rc = checkrootdir((*inodetbl)[1]);
+                for (int i = 1; NINODES > i; ++i) {
+                        if (SUCCESS != rc) {
+                                break;
+                        }
+                        rc = checktype((*inodetbl)[i]);
+                        if (SUCCESS != rc) {
+                                break;
+                        }
+                        rc = checkaddr((*inodetbl)[i]);
+                        if (SUCCESS != rc) {
+                                break;
+                        }
+
+                }
+        }
 
         debug("End reading inodes");
 
