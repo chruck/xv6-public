@@ -87,6 +87,7 @@ Part B1: filesystem checker, Linux
 #include "checkinode.h"      // checkinodes()
 #include "debug.h"           // debug(), checkifdebugging()
 #include "error.h"           // err, printerror()
+#include "mkfstools.h"       // NINODES
 #include "readsuperblock.h"  // readsuperblock()
 
 // Global vars
@@ -123,24 +124,17 @@ int main(const int argc, const char * const argv[])
         err rc = SUCCESS;
         FILE *fs_img = NULL;
         struct superblock sb = {};
-        struct dinode *inodetbl = NULL;
+        struct dinode inodetbl[NINODES] = {};
+        struct dinode *table = inodetbl;
 
         if (SUCCESS != (rc = checkparams(argc, argv, &fs_img))) {
                 return usage(rc);
         }
 
-        /*
-        for ( ; FS_DIR_MULTI_IN_FS >= rc; ++rc) {
-                printerror(rc);
-        }
-        */
-
         rc = readsuperblock(fs_img, &sb);
 
         if (SUCCESS == rc) {
-                rc = checkinodes(fs_img, &sb, inodetbl);
-
-                free(inodetbl);
+                rc = checkinodes(fs_img, &sb, &table);
         }
 
         if (SUCCESS == rc) {
@@ -150,14 +144,6 @@ int main(const int argc, const char * const argv[])
         if (SUCCESS == rc) {
                 rc = checkblocks(fs_img);
         }
-
-        /*
-        if (SUCCESS == rc) {
-                rc = free(inodetbl);
-        }
-        */
-
-        //free(inodetbl);
 
         if (SUCCESS == rc) {
                 rc = fclose(fs_img);
