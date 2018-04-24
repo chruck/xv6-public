@@ -65,9 +65,9 @@ uint xint(uint x)
 
 int main(int argc, char *argv[])
 {
-        int i, cc, fd;
+        int i, bytesread, fd;
         uint rootino, inum, off;
-        struct dirent de;
+        struct dirent direntry;
         char buf[BSIZE];
         struct dinode din;
 
@@ -102,25 +102,30 @@ int main(int argc, char *argv[])
 
         freeblock = nmeta;      // the first free block that we can allocate
 
+        // initialize the whole filesystem
         for (i = 0; i < FSSIZE; i++)
                 wsect(i, zeroes);
 
+        // write the superblock
         memset(buf, 0, sizeof(buf));
         memmove(buf, &sb, sizeof(sb));
         wsect(1, buf);
 
+        // create inode for '/'
         rootino = ialloc(T_DIR);
         assert(rootino == ROOTINO);
 
-        bzero(&de, sizeof(de));
-        de.inum = xshort(rootino);
-        strcpy(de.name, ".");
-        iappend(rootino, &de, sizeof(de));
+        // ... with '.'
+        bzero(&direntry, sizeof(direntry));
+        direntry.inum = xshort(rootino);
+        strcpy(direntry.name, ".");
+        iappend(rootino, &direntry, sizeof(direntry));
 
-        bzero(&de, sizeof(de));
-        de.inum = xshort(rootino);
-        strcpy(de.name, "..");
-        iappend(rootino, &de, sizeof(de));
+        // ... and '..'
+        bzero(&direntry, sizeof(direntry));
+        direntry.inum = xshort(rootino);
+        strcpy(direntry.name, "..");
+        iappend(rootino, &direntry, sizeof(direntry));
 
         for (i = 2; i < argc; i++) {
                 assert(index(argv[i], '/') == 0);
@@ -138,13 +143,13 @@ int main(int argc, char *argv[])
 
                 inum = ialloc(T_FILE);
 
-                bzero(&de, sizeof(de));
-                de.inum = xshort(inum);
-                strncpy(de.name, argv[i], DIRSIZ);
-                iappend(rootino, &de, sizeof(de));
+                bzero(&direntry, sizeof(direntry));
+                direntry.inum = xshort(inum);
+                strncpy(direntry.name, argv[i], DIRSIZ);
+                iappend(rootino, &direntry, sizeof(direntry));
 
-                while ((cc = read(fd, buf, sizeof(buf))) > 0)
-                        iappend(inum, buf, cc);
+                while ((bytesread = read(fd, buf, sizeof(buf))) > 0)
+                        iappend(inum, buf, bytesread);
 
                 close(fd);
         }
@@ -240,35 +245,35 @@ void balloc(int used)
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
-void iappend(uint inum, void *xp, int n)
+void iappend(uint inodenum, void *xp, int n)
 {
         char *p = (char *)xp;
         uint fbn, off, n1;
-        struct dinode din;
+        struct dinode inode;
         char buf[BSIZE];
         uint indirect[NINDIRECT];
         uint x;
 
-        rinode(inum, &din);
-        off = xint(din.size);
-        // printf("append inum %d at off %d sz %d\n", inum, off, n);
+        rinode(inodenum, &inode);
+        off = xint(inode.size);
+        // printf("append inodenum %d at off %d sz %d\n", inodenum, off, n);
         while (n > 0) {
                 fbn = off / BSIZE;
                 assert(fbn < MAXFILE);
                 if (fbn < NDIRECT) {
-                        if (xint(din.addrs[fbn]) == 0) {
-                                din.addrs[fbn] = xint(freeblock++);
+                        if (xint(inode.addrs[fbn]) == 0) {
+                                inode.addrs[fbn] = xint(freeblock++);
                         }
-                        x = xint(din.addrs[fbn]);
+                        x = xint(inode.addrs[fbn]);
                 } else {
-                        if (xint(din.addrs[NDIRECT]) == 0) {
-                                din.addrs[NDIRECT] = xint(freeblock++);
+                        if (xint(inode.addrs[NDIRECT]) == 0) {
+                                inode.addrs[NDIRECT] = xint(freeblock++);
                         }
-                        rsect(xint(din.addrs[NDIRECT]), (char *)indirect);
+                        rsect(xint(inode.addrs[NDIRECT]), (char *)indirect);
                         if (indirect[fbn - NDIRECT] == 0) {
                                 indirect[fbn - NDIRECT] =
                                         xint(freeblock++);
-                                wsect(xint(din.addrs[NDIRECT]),
+                                wsect(xint(inode.addrs[NDIRECT]),
                                       (char *)indirect);
                         }
                         x = xint(indirect[fbn - NDIRECT]);
@@ -281,6 +286,6 @@ void iappend(uint inum, void *xp, int n)
                 off += n1;
                 p += n1;
         }
-        din.size = xint(off);
-        winode(inum, &din);
+        inode.size = xint(off);
+        winode(inodenum, &inode);
 }
