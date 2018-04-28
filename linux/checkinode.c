@@ -87,6 +87,33 @@ err checkrootdir(struct dinode inode)
         return rc;
 }
 
+bool inuse(struct dinode inode)
+{
+        if (0 == inode.type
+            && 0 == inode.major
+            && 0 == inode.minor
+            && 0 == inode.nlink
+            && 0 == inode.size
+            && 0 == inode.addrs[0]) {
+                return false;
+        }
+        return true;
+}
+
+err checkinode(struct dinode inode)
+{
+        err rc = checktype(inode);
+        if (SUCCESS != rc) {
+                return rc;
+        }
+
+        rc = checkaddr(inode);
+        if (SUCCESS != rc) {
+                return rc;
+        }
+        return rc;
+}
+
 err checkinodes(FILE *xv6_fs_img, struct superblock *sb,
                 //struct dinode *inodetbl[NINODES])
                 struct dinode **inodetbl)
@@ -98,22 +125,22 @@ err checkinodes(FILE *xv6_fs_img, struct superblock *sb,
         rc = loadinodetable(xv6_fs_img, sb, inodetbl);
 
         if (SUCCESS == rc) {
-                // first inode is 1, not 0
+                printf("Checking inode:  ");
+                // first inode is 1, not 0, and it should be '/'
                 rc = checkrootdir((*inodetbl)[1]);
+
                 for (int i = 1; NINODES > i; ++i) {
                         if (SUCCESS != rc) {
                                 break;
                         }
-                        rc = checktype((*inodetbl)[i]);
-                        if (SUCCESS != rc) {
-                                break;
+                        if (!inuse((*inodetbl)[i])) {
+                                continue;
                         }
-                        rc = checkaddr((*inodetbl)[i]);
-                        if (SUCCESS != rc) {
-                                break;
-                        }
+                        printf("%d ", i);
 
+                        rc = checkinode((*inodetbl)[i]);
                 }
+                printf("\n");
         }
 
         debug("End reading inodes");
