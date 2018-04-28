@@ -6,6 +6,21 @@ NOTES:
   indentation:  The only difference to the files not mentioned below is
   indentation, for my own readability.
 
+- Although I started on this project almost immediately after it was
+  posted, I had certain "life events" that limited the amount of
+  time I was able to devote to it and the reviews of the papers.
+  My mother-in-law discovered she had a heart flutter.  Now we are taking
+  care of her.  But that also meant that she could no longer take care of
+  my father-in-law, who has Parkinson's and dementia as a result of it.
+  We had to scramble to find and move him into a place with a "memory
+  ward" that specializes in dementia.  Since he moved-in over Easter,
+  he has had several problems, including many falls, one of which has
+  resulted in an ER visit.  All this is to say that by not completing
+  this assignment that you think I am being disrespectful.  I have really
+  enjoyed this class, and wish I could have devoted more time to it.
+  As it is, I did spend as much as I could spare, often staying up until
+  1 or 2am.  Thank you for this class, I have learned a lot.
+
 Part A:  xv6 priority-based scheduler
         1 = low priority
         2 = high priority
@@ -205,25 +220,12 @@ linux/Makefile:
 linux/fscheck.c:
 - Code for fscheck program
 
-linux/check*.[ch], linux/*error.[ch]:
+linux/*.[ch]
 - Code to support fscheck program
 
-proc.c:
-- Added `clone()`, `join()`, and corresponding syscall functions.
+mkfs.c:
+- Added comments
+- Changed var names to better ones
 
 readme-eckard.md:
 - This file, explaining all files that were changed or created.
-
-syscall.c:
-- Referenced external functions `sys_clone()` and `sys_join()`.
-- Appended `sys_clone` and `sys_join` to `syscalls`.
-
-syscall.h:
-- Set `SYS_clone` to `22`.
-- Set `SYS_join` to `23`.
-
-testthr.c:
-- Program created for more tests for Project 3.
-
-usys.S:
-- Appended `clone` and `join` to `SYSCALL` macro calls.
