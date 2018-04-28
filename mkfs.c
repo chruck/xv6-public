@@ -35,10 +35,10 @@ uint freeblock;
 void balloc(int);
 void wsect(uint, void *);
 void winode(uint, struct dinode *);
-void rinode(uint inum, struct dinode *ip);
+void rinode(uint inodenum, struct dinode *in_inode_p);
 void rsect(uint sec, void *buf);
 uint ialloc(ushort type);
-void iappend(uint inum, void *p, int n);
+void iappend(uint inodenum, void *p, int n);
 
 // convert to intel byte order
 ushort xshort(ushort x)
@@ -66,10 +66,10 @@ uint xint(uint x)
 int main(int argc, char *argv[])
 {
         int i, bytesread, fd;
-        uint rootino, inum, off;
+        uint rootino, inodenum, off;
         struct dirent direntry;
         char buf[BSIZE];
-        struct dinode din;
+        struct dinode inode;
 
         static_assert(sizeof(int) == 4, "Integers must be 4 bytes!");
 
@@ -141,25 +141,25 @@ int main(int argc, char *argv[])
                 if (argv[i][0] == '_')
                         ++argv[i];
 
-                inum = ialloc(T_FILE);
+                inodenum = ialloc(T_FILE);
 
                 bzero(&direntry, sizeof(direntry));
-                direntry.inum = xshort(inum);
+                direntry.inum = xshort(inodenum);
                 strncpy(direntry.name, argv[i], DIRSIZ);
                 iappend(rootino, &direntry, sizeof(direntry));
 
                 while ((bytesread = read(fd, buf, sizeof(buf))) > 0)
-                        iappend(inum, buf, bytesread);
+                        iappend(inodenum, buf, bytesread);
 
                 close(fd);
         }
 
         // fix size of root inode dir
-        rinode(rootino, &din);
-        off = xint(din.size);
+        rinode(rootino, &inode);
+        off = xint(inode.size);
         off = ((off / BSIZE) + 1) * BSIZE;
-        din.size = xint(off);
-        winode(rootino, &din);
+        inode.size = xint(off);
+        winode(rootino, &inode);
 
         balloc(freeblock);
 
@@ -178,29 +178,29 @@ void wsect(uint sec, void *buf)
         }
 }
 
-void winode(uint inum, struct dinode *ip)
+void winode(uint inodenum, struct dinode *in_inode_p)
 {
         char buf[BSIZE];
-        uint bn;
-        struct dinode *dip;
+        uint blocknum;
+        struct dinode *inode_p;
 
-        bn = IBLOCK(inum, sb);
-        rsect(bn, buf);
-        dip = ((struct dinode *)buf) + (inum % IPB);
-        *dip = *ip;
-        wsect(bn, buf);
+        blocknum = IBLOCK(inodenum, sb);
+        rsect(blocknum, buf);
+        inode_p = ((struct dinode *)buf) + (inodenum % IPB);
+        *inode_p = *in_inode_p;
+        wsect(blocknum, buf);
 }
 
-void rinode(uint inum, struct dinode *ip)
+void rinode(uint inodenum, struct dinode *in_inode_p)
 {
         char buf[BSIZE];
-        uint bn;
-        struct dinode *dip;
+        uint blocknum;
+        struct dinode *inode_p;
 
-        bn = IBLOCK(inum, sb);
-        rsect(bn, buf);
-        dip = ((struct dinode *)buf) + (inum % IPB);
-        *ip = *dip;
+        blocknum = IBLOCK(inodenum, sb);
+        rsect(blocknum, buf);
+        inode_p = ((struct dinode *)buf) + (inodenum % IPB);
+        *in_inode_p = *inode_p;
 }
 
 void rsect(uint sec, void *buf)
@@ -217,15 +217,16 @@ void rsect(uint sec, void *buf)
 
 uint ialloc(ushort type)
 {
-        uint inum = freeinode++;
-        struct dinode din;
+        uint inodenum = freeinode++;
+        struct dinode inode;
 
-        bzero(&din, sizeof(din));
-        din.type = xshort(type);
-        din.nlink = xshort(1);
-        din.size = xint(0);
-        winode(inum, &din);
-        return inum;
+        bzero(&inode, sizeof(inode));
+        inode.type = xshort(type);
+        inode.nlink = xshort(1);
+        inode.size = xint(0);
+        winode(inodenum, &inode);
+
+        return inodenum;
 }
 
 void balloc(int used)
@@ -247,44 +248,47 @@ void balloc(int used)
 
 void iappend(uint inodenum, void *xp, int n)
 {
-        char *p = (char *)xp;
-        uint fbn, off, n1;
+        char *inbuf = (char *)xp;
+        uint blocknum, off, n1;
         struct dinode inode;
         char buf[BSIZE];
         uint indirect[NINDIRECT];
-        uint x;
+        uint sectnum;
 
         rinode(inodenum, &inode);
         off = xint(inode.size);
         // printf("append inodenum %d at off %d sz %d\n", inodenum, off, n);
         while (n > 0) {
-                fbn = off / BSIZE;
-                assert(fbn < MAXFILE);
-                if (fbn < NDIRECT) {
-                        if (xint(inode.addrs[fbn]) == 0) {
-                                inode.addrs[fbn] = xint(freeblock++);
+                blocknum = off / BSIZE;
+                assert(blocknum < MAXFILE);
+
+                if (blocknum < NDIRECT) {  // direct blocks
+                        if (xint(inode.addrs[blocknum]) == 0) {
+                                inode.addrs[blocknum] = xint(freeblock++);
                         }
-                        x = xint(inode.addrs[fbn]);
-                } else {
+                        sectnum = xint(inode.addrs[blocknum]);
+
+                } else {  // indirect blocks
                         if (xint(inode.addrs[NDIRECT]) == 0) {
                                 inode.addrs[NDIRECT] = xint(freeblock++);
                         }
                         rsect(xint(inode.addrs[NDIRECT]), (char *)indirect);
-                        if (indirect[fbn - NDIRECT] == 0) {
-                                indirect[fbn - NDIRECT] =
+                        if (indirect[blocknum - NDIRECT] == 0) {
+                                indirect[blocknum - NDIRECT] =
                                         xint(freeblock++);
                                 wsect(xint(inode.addrs[NDIRECT]),
                                       (char *)indirect);
                         }
-                        x = xint(indirect[fbn - NDIRECT]);
+                        sectnum = xint(indirect[blocknum - NDIRECT]);
                 }
-                n1 = min(n, (fbn + 1) * BSIZE - off);
-                rsect(x, buf);
-                bcopy(p, buf + off - (fbn * BSIZE), n1);
-                wsect(x, buf);
+
+                n1 = min(n, (blocknum + 1) * BSIZE - off);
+                rsect(sectnum, buf);
+                bcopy(inbuf, buf + off - (blocknum * BSIZE), n1);
+                wsect(sectnum, buf);
                 n -= n1;
                 off += n1;
-                p += n1;
+                inbuf += n1;
         }
         inode.size = xint(off);
         winode(inodenum, &inode);
