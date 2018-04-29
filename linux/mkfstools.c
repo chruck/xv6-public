@@ -15,42 +15,16 @@
 #include <unistd.h>     // lseek(2)
 #include <stdlib.h>     // exit(3)
 #include <string.h>     // bzero(3)
-//#include <fcntl.h>
 #include <assert.h>     // assert(3)
 
 #define stat xv6_stat           // avoid clash with host struct stat
-//#include "types.h"
-//#include "fs.h"
-//#include "stat.h"
 #include "../param.h"   // FSSIZE
 #include "debug.h"      // debug(), checkifdebugging()
 #include "error.h"      // BAD_FS_FILE_*
 #include "mkfstools.h"
 
-// Disk layout:
-// [ boot block | sb block | log | inode blocks | free bit map | data blocks ]
-
-//int nbitmap = FSSIZE / (BSIZE * 8) + 1;
-//int ninodeblocks = NINODES / IPB + 1;
-//int nlog = LOGSIZE;
-//int nmeta;                      // Number of meta blocks (boot, sb, nlog, inode, bitmap)
-//int nblocks;                    // Number of data blocks
-
-//int fsfd;
-//struct superblock sb;
-//char zeroes[BSIZE];
 uint freeinode = 1;
 uint freeblock;
-
-/*
-void balloc(int);
-err wsect(xv6_fs_img, uint, void *);
-err winode(FILE *xv6_fs_img, uint, struct dinode *, uint inodestart);
-err rinode(FILE *xv6_fs_img, uint inum, struct dinode *ip, uint inodestart);
-err rsect(xv6_fs_img, uint sec, void *buf);
-uint ialloc(FILE *xv6_fs_img, ushort type, uint inodestart);
-err iappend(uint inum, void *p, int n);
-*/
 
 // convert to intel byte order
 ushort xshort(ushort x)
