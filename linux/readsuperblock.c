@@ -19,22 +19,10 @@
 err readsuperblock(FILE *xv6_fs_img, struct superblock *sb)
 {
         err rc = SUCCESS;
-        //const long offset = 1 * BSIZE;
         uchar buf[BSIZE] = "";
 
         debug("Begin reading superblock");
 
-        /*
-        if (0 != fseek(xv6_fs_img, offset, SEEK_SET)) {
-                debug("error reading superblock");
-                return BAD_FS_FILE_SEEK;
-        }
-
-        if (1 != fread(&buf, BSIZE, 1, xv6_fs_img)) {
-                debug("error reading superblock:  short");
-                return BAD_FS_FILE_READ;
-        }
-        */
         if (SUCCESS != (rc = rsect(xv6_fs_img, 1, &buf))) {
                 debug("error reading superblock");
                 return rc;
